@@ -2,7 +2,6 @@
 *bkp*
 *NOVO
 
-
 /ATTACHED_FILE/*
 !ATTACHED_FILE/.gitkeep
 
@@ -24,15 +23,4 @@
 /laudo/txt_*/*/
 /laudo/xml_*/*/
 
-solicitacao/*/
-
-
-
-
-
-
-
-
-
-
-fotos/*/
+/solicitacao/*/
