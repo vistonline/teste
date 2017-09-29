@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+<title>Ferramentas</title>
+<script src="../js/funcoes.js" type="text/javascript"></script> 
+<style type="text/css">
+<!--
+.style1 {color: #FFFFFF}
+.style12 {	color: #333333;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+}
+-->
+</style>
+</head>
+<?
+include "../../adm/conecta.php";
+include "../verifica.php";
+   $focus1="onfocus=@this.style.borderStyle='solid';this.style.borderColor='#6B90C5';@ onblur=@this.style.borderStyle='';this.style.borderColor='';@";
+   $focus = str_replace("@",'"',$focus1);
+   $num_por_pagina = 50; 
+	    $pagina = $_GET[pagina];
+	    if(strlen($pagina)<=0)
+	    {
+	    $pagina = 1;
+	    }   
+	    $primeiro_registro=($pagina*$num_por_pagina)-$num_por_pagina;
+if($_GET[dados]!=='')
+{
+?>
+
+<body>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+      <tr>
+        <td height="27" colspan="4" align="right"style="color:#FFF; background:#000; text-align:center; font-weight:bold">
+        &nbsp;
+        <input name="button8" type="button" class="botao1" id="button8" onclick="x('','ferramentas/ferramentas_email','visualizar_ferramentas_email')" value="fechar"/>
+&nbsp;</td>
+      </tr>
+      <tr>
+        <td height="27" colspan="4"  class="style12">
+        &nbsp;Data&nbsp;<span class="style12" >
+        <input name="data_inicio" type="text" class="style12" id="data_inicio" onkeypress="mascara(this,data);" size="10" maxlength="10" <? echo $focus;?> />
+&nbsp;a&nbsp;<span class="style12" >
+<input name="data_final" type="text" class="style12" id="data_final" onkeypress="mascara(this,data);" size="10" maxlength="10" <? echo $focus;?> />
+&nbsp;ou
+busca 
+<input name="laudo" type="text" class="style12" id="laudo" size="30" <? echo $focus;?> />
+&nbsp;
+<input name="button3" type="submit" class="botao" id="button3" value="buscar" onclick="x('123&&data_inicio='+
+document.getElementById('data_inicio').value.charAt(6)+''+
+document.getElementById('data_inicio').value.charAt(7)+''+
+document.getElementById('data_inicio').value.charAt(8)+''+
+document.getElementById('data_inicio').value.charAt(9)+''+
+document.getElementById('data_inicio').value.charAt(3)+''+
+document.getElementById('data_inicio').value.charAt(4)+''+
+document.getElementById('data_inicio').value.charAt(0)+''+
+document.getElementById('data_inicio').value.charAt(1)+'&&data_final='+
+document.getElementById('data_final').value.charAt(6)+''+
+document.getElementById('data_final').value.charAt(7)+''+
+document.getElementById('data_final').value.charAt(8)+''+
+document.getElementById('data_final').value.charAt(9)+''+
+document.getElementById('data_final').value.charAt(3)+''+
+document.getElementById('data_final').value.charAt(4)+''+
+document.getElementById('data_final').value.charAt(0)+''+
+document.getElementById('data_final').value.charAt(1)+'&&laudo='+document.getElementById('laudo').value,'ferramentas/ferramentas_email','visualizar_ferramentas_email');"/>
+&nbsp;- 
+      <?
+      //pegando o nome da empresa
+$sql_empresa = "SELECT empresa FROM ".$bancoDados.".user WHERE id = ".$_SESSION[roteirizador]."";
+$resultado_empresa = @mysql_query($sql_empresa,$db);
+$empresa = @mysql_fetch_array($resultado_empresa);
+if($_SESSION[roteirizador]=='0')
+{
+$empresa[empresa]='BS2 CONSULTORIA';   
+}
+$ordem = " order by id DESC LIMIT $primeiro_registro, $num_por_pagina";
+ 	//consultando laudo resumido
+	$foi ='';
+	if($_GET[data_inicio]&&$_GET[data_final])
+	{
+	 $sql_resumido1 = "SELECT data,hora,titulo,emails,chave FROM ".$bancoDados.".controle_vp_email WHERE arquivo !='' AND empresa like '".$empresa[empresa]."' AND data >= ".$_GET[data_inicio]." AND data <= ".$_GET[data_final];
+	 $sql_resumido = $sql_resumido1.$ordem;
+	echo "E-mails enviados de ".$_GET[data_inicio]{6}.$_GET[data_inicio]{7}.'/'.$_GET[data_inicio]{4}.$_GET[data_inicio]{5}.'/'.$_GET[data_inicio]{0}.$_GET[data_inicio]{1}.$_GET[data_inicio]{2}.$_GET[data_inicio]{3}." - ".$_GET[data_final]{6}.$_GET[data_final]{7}.'/'.$_GET[data_final]{4}.$_GET[data_final]{5}.'/'.$_GET[data_final]{0}.$_GET[data_final]{1}.$_GET[data_final]{2}.$_GET[data_final]{3}."&nbsp;&nbsp;";
+	$foi ='1';
+	}
+	if($_GET[data_inicio]&&$foi=='')
+	{
+	 $sql_resumido1 = "SELECT data,hora,titulo,emails,chave FROM ".$bancoDados.".controle_vp_email WHERE arquivo !='' AND empresa like '".$empresa[empresa]."' AND data = ".$_GET[data_inicio];
+	 $sql_resumido = $sql_resumido1.$ordem;
+	echo "E-mails enviados de ".$_GET[data_inicio]{6}.$_GET[data_inicio]{7}.'/'.$_GET[data_inicio]{4}.$_GET[data_inicio]{5}.'/'.$_GET[data_inicio]{0}.$_GET[data_inicio]{1}.$_GET[data_inicio]{2}.$_GET[data_inicio]{3}."&nbsp;&nbsp;";
+	$foi ='1';
+	}
+	if($_GET[data_final]&&$foi=='')
+	{
+	 $sql_resumido1 = "SELECT data,hora,titulo,emails,chave FROM ".$bancoDados.".controle_vp_email WHERE arquivo !='' AND empresa like '".$empresa[empresa]."' AND data = ".$_GET[data_final];
+	 $sql_resumido = $sql_resumido1.$ordem;
+	echo "E-mails enviados de ".$_GET[data_final]{6}.$_GET[data_final]{7}.'/'.$_GET[data_final]{4}.$_GET[data_final]{5}.'/'.$_GET[data_final]{0}.$_GET[data_final]{1}.$_GET[data_final]{2}.$_GET[data_final]{3}."&nbsp;&nbsp;";
+	$foi ='1';
+	}
+	if($_GET[laudo]&&$foi=='')
+	{
+	 $sql_resumido1 = "SELECT data,hora,titulo,emails,chave FROM ".$bancoDados.".controle_vp_email WHERE arquivo !='' AND empresa like '".$empresa[empresa]."' AND titulo like '%$_GET[laudo]%' OR 
+	  empresa like '".$empresa[empresa]."' AND emails like '%$_GET[laudo]%' ";
+	 $sql_resumido = $sql_resumido1.$ordem;
+	echo "E-mails da busca ".$_GET[laudo]."&nbsp;&nbsp;";
+	$foi ='1';
+	}
+	if($foi=='')
+	{
+	 $sql_resumido1 = "SELECT data,hora,titulo,emails,chave FROM ".$bancoDados.".controle_vp_email WHERE arquivo !='' AND empresa like '".$empresa[empresa]."' AND data = ".date(Ymd);
+	 $sql_resumido = $sql_resumido1.$ordem;
+	echo "E-mails enviados hoje&nbsp;&nbsp;";
+	} 
+	  ?></span></span></td>
+      </tr>
+<?
+
+	 $result_resumido = @mysql_query($sql_resumido,$db1);
+	 if(@mysql_num_rows($result_resumido)>0)
+	 {
+?>
+      <tr>
+         <td height="27"  class="style12">&nbsp;&nbsp;Data / Hora&nbsp;</td>
+        <td  class="style12">&nbsp;&nbsp;T&iacute;tulo</td>
+        <td  class="style12">&nbsp;&nbsp;E-mail</td>
+        <td  class="style12">&nbsp;A&ccedil;&otilde;es</td>
+      </tr>
+         <?
+		while ($resumido = @mysql_fetch_array($result_resumido))
+		{
+ ?>
+ <TR onMouseOver="this.style.backgroundColor='#0099cc'" onMouseOut="javascript:this.style.backgroundColor=''" >
+    <td height="27" class="style12">&nbsp;&nbsp;<?
+    echo $resumido[data]{6}.$resumido[data]{7}.'/'.$resumido[data]{4}.$resumido[data]{5}.'/'.$resumido[data]{0}.$resumido[data]{1}.$resumido[data]{2}.$resumido[data]{3};
+	?>
+    <br />
+    &nbsp;
+    <? 
+	echo $resumido[hora]{0}.$resumido[hora]{1}.':'.$resumido[hora]{2}.$resumido[hora]{3};
+	?>    &nbsp;&nbsp;</td>
+    <td height="27" nowrap="nowrap" class="style12">&nbsp;&nbsp;      <? 
+	echo $resumido[titulo];
+	?></td>
+    <td height="27" class="style12">&nbsp;&nbsp;      <? 
+	echo $resumido[emails];
+	?></td>
+    <td height="27" nowrap="nowrap" class="style12">
+      &nbsp;
+      <input name="button12" type="button" class="botao" id="button12" value="reenviar e-mail"  onclick="window.open('<? echo $endereco_email_9w.$resumido[chave];?>'); this.value='enviado';"/></td>
+ </tr>
+ <? 
+ 		}
+ 	}
+ ?>
+ <TR onMouseOver="this.style.backgroundColor='#0099cc'" onMouseOut="javascript:this.style.backgroundColor=''" >
+   <td height="27" colspan="5" class="style12"><?
+		$result_rot_conta = mysql_query($sql_resumido1,$db1);
+		$total_paginas = ceil(mysql_num_rows($result_rot_conta)/$num_por_pagina);
+		echo "<br><br>>>paginas = ".$total_paginas."<br> total de registros = ".mysql_num_rows($result_rot_conta)."<<br><br><br>";
+
+
+$prev = $pagina - 1;$next = $pagina + 1;
+// se página maior que 1 (um), então temos link para a página anterior
+if ($pagina > 1) {    $prev_link = "<a href=\"#\" 
+onclick=\"x('123&&pagina=$prev&&data_inicio=$_GET[data_inicio]&&data_final=$_GET[data_final]&&laudo=$_GET[laudo]','ferramentas/ferramentas_email','visualizar_ferramentas_email');\">Anterior</a>";  } else { 
+// senão não há link para a página anterior    
+$prev_link = "Anterior";  }
+// se número total de páginas for maior que a página corrente, 
+// então temos link para a próxima página  
+if ($total_paginas > $pagina) {    $next_link = "<a href=\"#\" 
+onclick=\"x('123&&pagina=$next&&data_inicio=$_GET[data_inicio]&&data_final=$_GET[data_final]&&laudo=$_GET[laudo]','ferramentas/ferramentas_email','visualizar_ferramentas_email');\">Próxima";  } else { 
+// senão não há link para a próxima página    
+$next_link = "Próxima";  }
+
+// vamos arredondar para o alto o número de páginas  que serão necessárias para exibir todos os 
+// registros. Por exemplo, se  temos 20 registros e mostramos 6 por página, nossa variável  
+// $total_paginas será igual a 20/6, que resultará em 3.33. Para exibir os  2 registros 
+// restantes dos 18 mostrados nas primeiras 3 páginas (0.33),  será necessária a quarta página. 
+// Logo, sempre devemos arredondar uma  fração de número real para um inteiro de cima e isto é 
+// feito com a  função ceil()/  
+$total_paginas = ceil($total_paginas);  $painel = "";  for ($x=1; $x<=$total_paginas; $x++) {    if ($x==$pagina) {
+// se estivermos na página corrente, não exibir o link para visualização desta página       
+$painel .= " [$x] ";    } else {      $painel .= " <a href=\"#\"  onclick=\"x('123&&pagina=$x&&data_inicio=$_GET[data_inicio]&&data_final=$_GET[data_final]&&laudo=$_GET[laudo]','ferramentas/ferramentas_email','visualizar_ferramentas_email');\">[$x]</a>";    }  }
+// exibir painel na tela
+echo "$prev_link | $painel | $next_link";
+?></td>
+  </tr>
+</table>
+<?
+}
+?>
+</body>
+</html>

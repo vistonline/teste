@@ -1,13 +1,25 @@
 *BKP*
 *bkp*
 *NOVO
-PHOTOS/ZIPs/*
+
+
+/ATTACHED_FILE/*
+!ATTACHED_FILE/.gitkeep
+
+/PHOTOS/ZIPs/*
 !PHOTOS/ZIPs/.gitkeep
+/PHOTOS/rot_*/
 
+/cloud/
 
+/consultaPlacas/*
+!consultaPlacas/.gitkeep
 
+/email/*
+!email/.gitkeep
 
-
+/ferramentas/email/email_geral/*
+!ferramentas/email/email_geral/.gitkeep
 
 
 

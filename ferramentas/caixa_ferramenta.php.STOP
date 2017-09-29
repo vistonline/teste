@@ -1,0 +1,33 @@
+<html>
+<head>
+<script type="text/javascript" src="richtext.js"></script>
+</head>
+<body>
+<script language="JavaScript" type="text/javascript">
+<!--
+function submitForm() {
+	//make sure hidden and iframe values are in sync before submitting form
+	//to sync only 1 rte, use updateRTE(rte)
+	//to sync all rtes, use updateRTEs
+	//updateRTE('rte1');
+	updateRTEs();
+	//change the following line to true to submit form
+	return true;
+}
+
+//Usage: initRTE(imagesPath, includesPath, cssFile)
+initRTE("images/", "", "");
+//-->
+</script>
+
+<form name="RTEDemo" method="post" action="#" onMouseOut="return submitForm();">
+
+<script language="JavaScript" type="text/javascript">
+<!--
+//Usage: writeRichText(fieldname, html, width, height, buttons, readOnly)
+writeRichText('<? echo $_GET[campo];?>', '<? echo str_replace('@',"#",$_GET[valor]);?>', 520, 200, true, false);
+//-->
+</script><input name="valor" type="hidden" value="">
+</form>
+</body>
+</html>
