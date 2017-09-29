@@ -21,8 +21,10 @@
 /ferramentas/email/email_geral/*
 !ferramentas/email/email_geral/.gitkeep
 
+/laudo/txt_*/*/
+/laudo/xml_*/*/
 
-
+solicitacao/*/
 
 
 
