@@ -24,3 +24,14 @@
 /laudo/xml_*/*/
 
 /solicitacao/*/
+
+/relatorio/*
+!/relatorio/Classes/
+!/relatorio/graficos/
+!/relatorio/images/
+!/relatorio/relatorio2/
+!/relatorio/template/
+!/relatorio/uploader/
+!/relatorio/*.*
+/relatorio/*BKP*
+/relatorio/*bkp*

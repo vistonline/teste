@@ -1,0 +1,270 @@
+<?php
+session_start();
+include "../../adm/conecta.php";
+include "../verifica.php";
+
+if($_POST['vistoriador']!=''){
+$vistoriador=" AND controle_prest=".$_POST['vistoriador']." ";
+}else{
+	echo "<h3><br><br><br><br><center>&Eacute; preciso selecionar um vistoriador</center></h3>";
+	exit();
+	}
+
+
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Controle e distribui&ccedil;&atilde;o de laudos</title>
+
+<script type="text/javascript">
+function valida(registroId,vistoriador,nrInicial,nrFinal,botao){
+	
+	if(document.getElementById('nr_inicio_'+registroId).value.length==''){
+		alert('Favor preencha o campo Primeiro Laudo!');
+		document.getElementById('cepInicial_'+registroId).focus();
+		return false;
+		}
+	if(document.getElementById('nr_fim_'+registroId).value.length==''){
+		alert('Favor preencha o campo Último Laudo!');
+		document.getElementById('cepFinal_'+registroId).focus();
+		return false;
+		}
+	if(parseInt(document.getElementById('nr_inicio_'+registroId).value)>parseInt(document.getElementById('nr_fim_'+registroId).value)){
+		alert('O Primeiro Laudo não pode ser maior que o Último Laudo!');
+		return false;
+		}
+	
+	document.getElementById('registroId').value=registroId;
+	document.getElementById('vistoriador').value=vistoriador;
+	document.getElementById('nr_inicio').value=nrInicial;
+	document.getElementById('nr_fim').value=nrFinal;
+	document.getElementById('botao').value=botao;
+	document.getElementById('form3').submit();	
+	}
+</script>
+</head>
+
+<body>
+
+<!-- ############################### DISTRIBUIR LAUDOS PARA VISTORIADORES ######################################### -->
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<form action="gravar_controleLaudos.php" method="post" name="form1" id="form1">
+<input type="hidden" name="tipo" id="tipo" value="distribuir" />
+  <tr>
+    <td height="50" colspan="5" style="color:#FFF; background:#000; text-align:center; font-weight:bold">Controle e distribui&ccedil;&atilde;o de laudos</td>
+  </tr>
+  <tr>
+    <td height="35">Vistoriador:
+    </td>
+    <td height="35">
+					<select name="contorle_prest" id="contorle_prest">
+                    <option value="">SELECIONE UM VISTORIADOR</option>
+					<?php 
+					$sql_prestador = "SELECT nome,id FROM ".$bancoDados.".user WHERE ativo = 0 AND permissao = 1 ORDER BY nome";
+					$result_prestador = mysql_query($sql_prestador,$db);
+					while($prestador = mysql_fetch_assoc($result_prestador)){
+						if($prestador['id']==$_POST['vistoriador']){$selected='selected="selected"';}else{$selected="";}
+						echo '<option value="'.$prestador['id'].'" '.$selected.'>'.strtoupper($prestador['nome']).'</option>'; 
+						}
+					?>
+                    </select>
+    </td>
+    <td height="35">Inicio:&nbsp;<input name="nr_inicio" type="text" size="10" max="10" />
+    </td>
+    <td height="35">Fim:&nbsp;<input name="nr_fim" type="text" size="10" max="10" />
+    </td>
+    <td height="35"><input type="submit" value="Inserir" />
+    </td>
+  </tr>
+</form>  
+</table>
+
+<br />
+
+<!-- ###################################### INSERIR LAUDOS CANCELADOS ############################################################# -->
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<form action="gravar_controleLaudos.php" method="post" name="form2" id="form2">
+<input type="hidden" name="tipo" id="tipo" value="cancelar" />
+  <tr>
+    <td height="50" colspan="5" style="color:#FFF; background:#000; text-align:center; font-weight:bold">Cancelar LAUDO</td>
+  </tr>
+  <tr>
+    <td colspan="3" height="35">Vistoriador:&nbsp;
+					<select name="contorle_prest" id="contorle_prest">
+                    <option value="">SELECIONE UM VISTORIADOR</option>
+					<?php 
+					$sql_prestador = "SELECT nome,id FROM ".$bancoDados.".user WHERE ativo = 0 AND permissao = 1 ORDER BY nome";
+					$result_prestador = mysql_query($sql_prestador,$db);
+					while($prestador = mysql_fetch_assoc($result_prestador)){
+						if($prestador['id']==$_POST['vistoriador']){$selected='selected="selected"';}else{$selected="";}
+						echo '<option value="'.$prestador['id'].'" '.$selected.'>'.strtoupper($prestador['nome']).'</option>'; 
+						}
+					?>
+                    </select>        
+    </td>
+    <td colspan="2" height="35">N&uacute;mero do Laudo:&nbsp;<input name="nr_laudo" type="text" size="10" max="10" />
+    </td>
+    </tr>
+    <tr>
+    <td colspan="5" height="35"><div align="left">Informe o motivo do cancelamento do laudo:&nbsp;</div><div align="left"><textarea name="obs" cols="70" rows="5" style="text-transform:uppercase" id="obs" ></textarea></div><div align="left"><input type="submit" value="Cancelar Laudo" /></div>  
+    </td>
+  </tr>
+</form>  
+</table>
+
+<br />
+<!-- ##################### VISUALIZAÇÃO DOS LAUDOS DISTRIBUIDOS ########################################## -->
+<?
+##################### controle de saldo ######################################
+$sql_controle = "SELECT * FROM ".$bancoDados.".controleLaudos WHERE saldo>0 ".$vistoriador." ORDER BY controle_prest,nr_inicio";
+$result_controle = mysql_query($sql_controle,$db);
+while ($controle = mysql_fetch_array($result_controle)){
+	$sql_cancelados = "SELECT COUNT(*) AS qtdeCanceladas FROM ".$bancoDados.".controleLaudosCancelados WHERE controle_prest=".$controle['controle_prest']." AND nr_laudo >=".$controle['nr_inicio']." AND nr_laudo <=".$controle['nr_fim'];   
+	$result_cancelados = mysql_query($sql_cancelados,$db);
+	$cancelados = @mysql_fetch_assoc($result_cancelados);   
+	
+	$sql_utilizados = "SELECT NRVISTORIA FROM ".$bancoDados.".vistoria_previa1 WHERE controle_prest=".$controle['controle_prest']." AND NRVISTORIA >=".$controle['nr_inicio']." AND NRVISTORIA <=".$controle['nr_fim'];
+	$result_utilizados = mysql_query($sql_utilizados,$db);
+	$contVR=0; // Vistoria realizadas digitadas ne tabela vistoria_previa1
+	$nrLaudos=""; // números de laudos para excluir da busca na tabela preCadastroVistoria (nrVistoria)
+	while($utilizados = @mysql_fetch_assoc($result_utilizados)){
+		$nrLaudos.=$utilizados['NRVISTORIA'].",";
+		$contVR++;
+		}
+	$nrLaudos=substr($nrLaudos,0,strlen($nrLaudos)-1);
+	
+	
+	if($nrLaudos!=''){	
+	$sql_utilizados2 ="SELECT COUNT(*) AS qtdeUtilizados FROM ".$bancoDados.".preCadastroVistoria WHERE usuario=".$controle['controle_prest']." AND nrVistoria >=".$controle['nr_inicio']." AND nrVistoria <=".$controle['nr_fim']. " AND nrVistoria NOT IN (".$nrLaudos.")";
+	}else{
+		$sql_utilizados2 ="SELECT COUNT(*) AS qtdeUtilizados FROM ".$bancoDados.".preCadastroVistoria WHERE usuario=".$controle['controle_prest']." AND nrVistoria >=".$controle['nr_inicio']." AND nrVistoria <=".$controle['nr_fim'];
+		}
+
+	$result_utilizados2 = mysql_query($sql_utilizados2,$db);
+	$utilizados2 = @mysql_fetch_assoc($result_utilizados2);
+	
+	
+	$laudosUtilizados=$contVR+$utilizados2['qtdeUtilizados'];
+	
+	##################### atualizada canceladas e utilizadas ##################################
+	$sql1 = "UPDATE ".$bancoDados.".controleLaudos SET laudos_cancelados=".$cancelados['qtdeCanceladas'].", laudos_utilizados=".$laudosUtilizados." WHERE id=".$controle['id'];
+	$result1 = mysql_query($sql1,$db);
+	###########################################################################################
+	
+	##################### atualiza saldo ######################################################
+	$sql_saldo = "SELECT laudos_utilizados,laudos_cancelados,qtde FROM ".$bancoDados.".controleLaudos WHERE id=".$controle['id'];   
+	$result_saldo = mysql_query($sql_saldo,$db);
+	$saldo = @mysql_fetch_assoc($result_saldo);
+	
+	$saldoAtual=($saldo['qtde']-($saldo['laudos_utilizados']+$saldo['laudos_cancelados']));
+	
+	$sql2 = "UPDATE ".$bancoDados.".controleLaudos SET saldo=".$saldoAtual." WHERE id=".$controle['id'];
+	$result2 = mysql_query($sql2,$db);
+	###########################################################################################
+	
+	
+	}
+	
+##############################################################################
+?>
+
+
+<form action="alterar_controleLaudos.php" method="post" name="form3" id="form3">
+	<table width="100%" border="00" cellspacing="0" cellpadding="0">
+  <tr>   
+    <td height="50" colspan="8" style="color:#FFF; background:#000; text-align:center; font-weight:bold">LISTA DE LAUDOS DISTRIBU&Iacute;DOS</td>
+  </tr>
+  <tr>
+  	<td>Vistoriador</td>
+    <td>Primeiro</td>
+    <td>&Uacute;ltimo</td>
+    <td>Qtde</td>
+    <td>Util.</td>
+    <td>Canc.</td>
+    <td>Saldo</td>
+    <td></td>
+  </tr>
+       <?
+    //selecionando as regiões atribuidas ao vistoriador 
+	$sql_distribuicao = "SELECT *
+	FROM ".$bancoDados.".controleLaudos WHERE saldo>0 ".$vistoriador." ORDER BY controle_prest,nr_inicio";
+	$result_distribuicao = mysql_query($sql_distribuicao,$db);
+	if(mysql_num_rows($result_distribuicao)>0)
+	{
+		$linha=1;
+		while ($distribuicao = mysql_fetch_array($result_distribuicao)){
+			if ($linha>0){
+			$corLinha="style='background-color:#FFF' onmouseover='this.style.backgroundColor=\"".$corBerraMenu."\"' onmouseout='this.style.backgroundColor=\"#FFF\"'";
+			}else{
+				$corLinha="style='background-color:#E6E8FA' onmouseover='this.style.backgroundColor=\"".$corBerraMenu."\"' onmouseout='this.style.backgroundColor=\"#E6E8FA\"'";
+				}	
+			
+	?>
+	<tr <? echo $corLinha; ?>>
+	  <input type="hidden" id="registroId_<? echo $distribuicao['id'];?>" value="<? echo $distribuicao['id'];?>" />
+	  <td height="35"> 
+	  <select id="contorle_prest_<? echo $distribuicao['id'];?>">
+ 					<?
+					$sql_prestador = "SELECT nome,id FROM ".$bancoDados.".user WHERE ativo = 0 AND permissao = 1 ORDER BY nome";
+					$result_prestador = mysql_query($sql_prestador,$db);
+					while($prestador = mysql_fetch_assoc($result_prestador)){
+						if($prestador['id']==$distribuicao['controle_prest']){$selected='selected="selected"';}else{$selected='';}
+						echo '<option value="'.$prestador['id'].'" '.$selected.'>'.strtoupper($prestador['nome']).'</option>'; 
+						}
+					?>
+					
+	  </select>
+	  </td> 
+	  <td height="35"><input type="text" size="10" maxlength="10" id="nr_inicio_<? echo $distribuicao['id'];?>" value="<? echo $distribuicao['nr_inicio'];?>" />
+	  </td>
+	  <td height="35"><input type="text" size="10" maxlength="10" id="nr_fim_<? echo $distribuicao['id'];?>" value="<? echo $distribuicao['nr_fim'];?>" />
+	  </td>
+      <td height="35"><input type="text" disabled="disabled" size="3" maxlength="3" id="qtde_<? echo $distribuicao['id'];?>" value="<? echo $distribuicao['qtde'];?>" />
+	  </td>
+	  <td height="35"><input type="text" disabled="disabled" size="3" maxlength="3" id="laudos_utilizados_<? echo $distribuicao['id'];?>" value="<? echo $distribuicao['laudos_utilizados'];?>" />
+	  </td>
+	  <td height="35"><input type="text" disabled="disabled" size="3" maxlength="3" id="laudos_cancelados_<? echo $distribuicao['id'];?>" value="<? echo $distribuicao['laudos_cancelados'];?>" />
+	  </td>
+	  <td height="35"><input type="text" disabled="disabled" size="3" maxlength="3" id="saldo_<? echo $distribuicao['id'];?>" value="<? echo $distribuicao['saldo'];?>" />
+	  </td>
+	  <td height="35">
+	  <input type="button" id="botao_<? echo $distribuicao['id'];?>" value="alterar" onclick="valida(document.getElementById('registroId_<? echo $distribuicao['id'];?>').value,document.getElementById('contorle_prest_<? echo $distribuicao['id'];?>').value,document.getElementById('nr_inicio_<? echo $distribuicao['id'];?>').value,document.getElementById('nr_fim_<? echo $distribuicao['id'];?>').value,'alterar');" />
+      
+      <? 
+	  if($distribuicao['laudos_cancelados']>0){
+	  ?>
+      <input type="image" src="images/Cancelados.png" title="Gerar relatório de laudos CANCELADOS" id="botao_<? echo $distribuicao['id'];?>" value="rel_laudosCancelados" onclick="valida(document.getElementById('registroId_<? echo $distribuicao['id'];?>').value,document.getElementById('contorle_prest_<? echo $distribuicao['id'];?>').value,document.getElementById('nr_inicio_<? echo $distribuicao['id'];?>').value,document.getElementById('nr_fim_<? echo $distribuicao['id'];?>').value,'rel_laudosCancelados');" />
+      <? } ?>
+      
+       <? 
+	  if($distribuicao['saldo']>0){
+	  ?>
+      <input type="image" src="images/Pendentes.png" title="Gerar relatório de laudos PENDENTES" id="botao_<? echo $distribuicao['id'];?>" value="rel_laudosPendentes" onclick="valida(document.getElementById('registroId_<? echo $distribuicao['id'];?>').value,document.getElementById('contorle_prest_<? echo $distribuicao['id'];?>').value,document.getElementById('nr_inicio_<? echo $distribuicao['id'];?>').value,document.getElementById('nr_fim_<? echo $distribuicao['id'];?>').value,'rel_laudosPendentes');" />
+      <? } ?>
+      </td>
+	<tr>
+    <?
+		
+		$linha=$linha*-1;
+		
+		} // FIM WHILE
+
+	 }  // FIM IF
+	 ?>
+    	<tr>   
+    		<td height="50" colspan="8" style="color:#FFF; background:#000; text-align:center; font-weight:bold"></td>
+  		</tr>
+	 </table>
+
+     <input type="hidden" name="registroId" id="registroId" value="" />
+     <input type="hidden" name="vistoriador" id="vistoriador" value="" />
+     <input type="hidden" name="nr_inicio" id="nr_inicio" value="" />
+     <input type="hidden" name="nr_fim" id="nr_fim" value="" />
+     <input type="hidden" name="botao" id="botao" value="" />
+    
+     </form>
+
+
+</body>
