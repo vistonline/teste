@@ -1,0 +1,193 @@
+<?
+
+//include "conecta.php";
+include "../../../adm/conecta.php";
+include "../../verifica.php";
+include "../../verifica_roteirizador.php";?>
+
+<? 
+if($_GET[div]=="checar_permissao")
+{
+if($_GET[dados]=='7'){
+?>
+<select name="usuario" id="analista">
+<option>Escolha um atendente</option>
+          <? 
+	
+	$sql_digitador = "SELECT * FROM ".$bancoDados.".user WHERE permissao = 7 and roiterizador = '".$_SESSION[roteirizador]."' and ativo = 0 order by nome";
+	$result_digitador = mysql_query($sql_digitador,$db);
+	if (mysql_num_rows($result_digitador)>0)
+	{
+		while ($da_digitador= mysql_fetch_array($result_digitador))
+		{
+	?>
+        <option value="<?=$da_digitador["id"]?>">
+          <?=$da_digitador["nome"] ?>
+          </option>
+        <? }
+			  } ?>
+   
+   
+    </select>
+<? 
+
+
+}?>
+<? 
+if($_GET[dados]=='2')
+{
+?>
+
+<select name="usuario" id="digitador">
+   <option>Escolha um digitador</option>
+  
+        <? 
+	
+	$sql_digitador = "SELECT * FROM ".$bancoDados.".user WHERE permissao = 2 and roiterizador = '".$_SESSION[roteirizador]."'  and ativo = 0 order by nome";
+	$result_digitador = mysql_query($sql_digitador,$db);
+	if (mysql_num_rows($result_digitador)>0)
+	{
+		while ($da_digitador= mysql_fetch_array($result_digitador))
+		{
+	?>
+        <option value="<?=$da_digitador["id"]?>">
+          <?=$da_digitador["nome"] ?>
+          </option>
+        <? }
+			  } ?>
+   
+   
+   
+    </select>   
+<?
+
+}?>
+<? 
+if($_GET[dados]=='10')
+{
+?>
+
+
+<select  name="usuario" id="analista">
+   <option>Escolha um analista</option>
+  
+           <? 
+	
+	$sql_digitador = "SELECT * FROM ".$bancoDados.".user WHERE permissao = 10 and roiterizador = '".$_SESSION[roteirizador]."' and ativo = 0 order by nome";
+	$result_digitador = mysql_query($sql_digitador,$db);
+	if (mysql_num_rows($result_digitador)>0)
+	{
+		while ($da_digitador= mysql_fetch_array($result_digitador))
+		{
+	?>
+        <option value="<?=$da_digitador["id"]?>">
+          <?=$da_digitador["nome"] ?>
+          </option>
+        <? }
+			  } ?>
+   
+   
+    </select>
+   
+<? 
+}
+
+if($_GET[dados]=='1')
+{
+?>
+
+
+<select  name="usuario" id="vistoriador">
+   <option>Escolha um vistoriador</option>
+  
+           <? 
+	
+	$sql_digitador = "SELECT * FROM ".$bancoDados.".user WHERE permissao = 1 and roiterizador = '".$_SESSION[roteirizador]."' and ativo = 0 order by nome";
+	$result_digitador = mysql_query($sql_digitador,$db);
+	if (mysql_num_rows($result_digitador)>0)
+	{
+		while ($da_digitador= mysql_fetch_array($result_digitador))
+		{
+	?>
+        <option value="<?=$da_digitador["id"]?>">
+          <?=$da_digitador["nome"] ?>
+          </option>
+        <? }
+			  } ?>
+   
+   
+    </select>
+   
+<? 
+}
+
+// VISTORIADOR QUE DIGITA
+if($_GET[dados]=='100')
+{
+?>
+
+
+<select  name="usuario" id="vistoriador">
+   <option>Escolha um vistoriador-digitador</option>
+  
+           <? 
+	
+	$sql_digitador = "SELECT * FROM ".$bancoDados.".user WHERE permissao = 1 and roiterizador = '".$_SESSION[roteirizador]."' and ativo = 0 order by nome";
+	$result_digitador = mysql_query($sql_digitador,$db);
+	if (mysql_num_rows($result_digitador)>0)
+	{
+		while ($da_digitador= mysql_fetch_array($result_digitador))
+		{
+	?>
+        <option value="<?=$da_digitador["id"]?>">
+          <?=$da_digitador["nome"] ?>
+          </option>
+        <? }
+			  } ?>
+   
+   
+    </select>
+   
+<? 
+}
+
+if($_GET[dados]=='90')
+{
+?>
+
+
+      <select name="usuario"  id="filial">
+      
+         <option>Escolha uma Filial</option>
+
+        <? 
+		$sql_posto = "SELECT uf,nome_filial,codigo_filial FROM ".$bancoDados.".controle_vp_filial WHERE roteirizador = ".$_SESSION["roteirizador"]." order by codigo_filial";
+		$result_posto = mysql_query($sql_posto,$db);
+		if (mysql_num_rows($result_posto)>0)
+		{ 
+		 	while ($filial = mysql_fetch_array($result_posto))
+			{
+	$sql_filial32= "SELECT id FROM ".$bancoDados.".user WHERE roiterizador=$_SESSION[roteirizador] AND filial=".$filial["codigo_filial"]." AND permissao=1";
+			$result_sql_filial32=mysql_query($sql_filial32,$db);
+			while ($rows32 = mysql_fetch_array($result_sql_filial32,MYSQL_ASSOC)){
+			$todas32.=$rows32["id"].",";
+			}
+							
+		    $todas32[strlen($todas32)-1]=' ';
+			$filial_correta=" AND controle_prest in ($todas32)";
+			
+
+				
+	  ?>
+      <option value="<? echo $todas32;?>"><? echo $filial["nome_filial"];?></option>
+        <?
+	 		$todas32 ="";
+ 		 }
+	 	 }
+	  ?>
+</select>
+   
+<? 
+}
+
+}?>

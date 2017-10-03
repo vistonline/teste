@@ -1,0 +1,182 @@
+<?
+include "../../adm/conecta.php";
+include "../verifica.php";
+ini_set("memory_limit","90M");
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script language="JavaScript" type="text/javascript" src="richtext.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<title>Atualizar Ve&iacute;culos SulAmerica</title>
+<style type="text/css">
+<!--
+.style1 {color: #FFFFFF}
+.style12 {	color: #333333;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+}
+.style12 {	color: #333333;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+}
+.style3 {font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+	color: #FF0000;
+	}
+.style2 {font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+	color: #003399;
+}
+</style>
+</head>
+
+<body>
+<form action="atualizar_veiculo_sulamerica.php" method="post" enctype="multipart/form-data" name="RTEDemo">
+<table width="100%" border="00" cellpadding="0" cellspacing="0">
+  <tr>
+    <td height="50" colspan="2" style="color:#FFF; background:#000; text-align:center; font-weight:bold">&nbsp;&nbsp;Atualizar Ve&iacute;culos Sulam&eacute;rica</td>
+  </tr>
+
+<TR onMouseOver="this.style.backgroundColor='#0099cc'" onMouseOut="javascript:this.style.backgroundColor=''" >
+    <td width="25%" height="30" class="style12">&nbsp;Insira o CSV </td>
+    <td> <div align="left" class="style12">
+      &nbsp;
+      <input type="file" name="Filedata" id="Filedata" />
+    </div></td>
+  </tr>
+  <tr> 
+    <td height="50" colspan="2">
+      <br /><br />
+       <div style="width:50%; float:left; text-align:center">
+   	    	<img src="../imagens/voltar.png" style="cursor:pointer" title="voltar" onclick="window.top.novo('ferramentas','body','checar_body');document.getElementById('atualiza').value='';" />
+		</div>
+   <div style="width:50%; float:left; text-align:center">
+   		<input type="image" src="../imagens/atualizar.png" name="Submit" id="button" title="Atualizar" />
+	</div>
+      </td>
+  </tr>
+</table>
+</form>
+<?
+
+preg_match('/(MT)[0-9]{6}/i', $_FILES['Filedata']["name"], $result);
+preg_match('/\.([0-9A-z]{1,})/i', $_FILES['Filedata']["name"], $result2);
+$nomeArquivo=$result[1];
+$extensao=$result2[1];
+
+if($_FILES)
+{
+@mkdir("atualizacoesTemp");
+$arquivo = "atualizacoesTemp/veiculos_".date(Ymd)."".date('H:i').".csv";
+move_uploaded_file($_FILES['Filedata']['tmp_name'], $arquivo);
+$fp = fopen($arquivo,'r');
+
+if( ($nomeArquivo=='MT') && (strtoupper($extensao)=='CSV') )
+{
+//lemos o arquivo
+$texto = fread($fp, filesize($arquivo));
+
+//transformamos as quebras de linha em etiquetas <br>
+$texto = nl2br($texto);
+$array = split("\n",$texto);
+
+$sql_excluir = "TRUNCATE TABLE veiculo_sulamerica";
+$result_excluir = @mysql_query($sql_excluir,$db);
+//print_r($array);
+?>
+<table width="98%" border="00" cellpadding="0" cellspacing="0">
+  <tr>
+    <td height="50" colspan="4" style="color:#FFF; background:#000; text-align:center; font-weight:bold">&nbsp;&nbsp;Dados da Atualiza&ccedil;&atilde;o</td>
+  </tr>
+ <? 
+ /*
+ 	trim($array_csv[0]) -> codigo
+	trim($array_csv[1]) -> modelo
+	trim($array_csv[2]) -> fabricante
+	trim($array_csv[3]) -> ano_inicio
+	trim($array_csv[4]) -> ano_fim
+	trim($array_csv[5]) -> classe
+	trim($array_csv[6]) -> procedencia
+	trim($array_csv[7]) -> fipe
+ */
+ $cont=0;
+ $contador=1;
+ $contador_novos=0;
+ $final = sizeof($array);
+   while($contador<$final)
+   {
+	   
+	   $array_csv = split(";",$array[$contador]);
+	   if(strlen(trim($array_csv[1]))<=0)
+	   {
+	   	   $array_csv = split(",",$array[$contador]);
+	   }
+	   
+	   if(strlen(trim($array_csv[0]))>=2)
+	   {
+			$sql1 = "INSERT INTO veiculo_sulamerica (codigo,modelo,fabricante,ano_inicio,ano_fim,classe,procedencia,fipe) 
+			VALUES (
+			'".trim($array_csv[0])."',
+			'".trim($array_csv[1])."',
+			'".trim($array_csv[2])."',
+			'".trim($array_csv[3])."',
+			'".trim($array_csv[4])."',
+			'".trim($array_csv[5])."',
+			'".trim($array_csv[6])."',
+			'".str_replace("<br />","",trim($array_csv[7]))."')";
+			$result2 = mysql_query($sql1,$db);
+			if ($result2)
+			{
+				$cont++;
+				$mensagem="<span class='style3'>Adicionado</span>";
+				$contador_novos++;
+			}
+		
+			
+			}
+	$array_csv ='';
+	$contador++;
+	}
+?>
+  <tr>
+    <td height="50" colspan="4"><center><h3>Quantidade total ve&iacute;culos cadastrados &nbsp;<? echo $cont;?>&nbsp;</h3></center></td>
+  </tr>
+</table>
+<?
+
+$obs="Quantidade total ve&iacute;culos cadastrados ".$cont;
+unlink($arquivo);
+} // FIM SE VALIDOU NOME 
+else{
+	
+	$arquivo = "atualizacoesTemp/atualizar_veiculo_sulamerica - ".$_SESSION['roteirizador'] . " - hora - ".date('H:i')." - " . $_FILES['Filedata']['name'];
+	move_uploaded_file($_FILES['Filedata']['tmp_name'], $arquivo);
+	$ponteiroArquivo = fopen($arquivo, "r");
+	
+	echo "<br /><br /><br /><center><h1>Não foi possível atualizar a tabela pois o arquivo enviado está em formato inválido.<br>Informe o administrador do sistema.<h1></center>";
+	$obs="Não foi possível atualizar a tabela pois o arquivo enviado está em formato inválido.";
+
+	}
+	
+##################################################### REGISTRA UPLOAD ##################################################################################
+include "../class.log.php";
+try{
+$registra = new registraLog();
+$registra->upload($_SERVER['REMOTE_ADDR'],"relatorio/","atualizar_veiculo_sulamerica.php",$_FILES['Filedata']["name"],$_SESSION['id'],$_SESSION['permissao'],$obs );
+}
+catch(Exception $erro)
+  {
+    echo $erro;
+  }
+######################################################################################################################################################
+
+}
+?>
+</body>
+</html>

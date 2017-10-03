@@ -1,0 +1,235 @@
+<?
+include "../../adm/conecta.php";
+include "../verifica.php";
+set_time_limit(0);
+ini_set("memory_limit","20192M");
+ini_set("pcre.backtrack_limit", 1000000);
+ini_set("pcre.recursion_limit", 1000000);
+
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script language="JavaScript" type="text/javascript" src="richtext.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Atualizar Ve&iacute;culos Allianz Seguros</title>
+<style type="text/css">
+<!--
+.style1 {color: #FFFFFF}
+.style12 {	color: #333333;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+}
+.style12 {	color: #333333;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+}
+.style3 {font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+	color: #FF0000;
+	}
+.style2 {font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+	color: #003399;
+}
+</style>
+</head>
+
+<body>
+<form action="atualizar_veiculo_allianz.php" method="post" enctype="multipart/form-data" name="RTEDemo">
+<table width="98%" border="00" cellpadding="0" cellspacing="0">
+  <tr>
+    <td height="50" colspan="2" style="color:#FFF; background:#000; text-align:center; font-weight:bold">&nbsp;&nbsp;Atualizar Ve&iacute;culos Allianz</td>
+  </tr>
+  <tr>
+    <td height="27" colspan="2"><span class="style12">&nbsp;&nbsp;</span></td>
+  </tr>
+<TR onMouseOver="this.style.backgroundColor='#0099cc'" onMouseOut="javascript:this.style.backgroundColor=''" >
+    <td width="25%" height="30" class="style12">&nbsp;&nbsp;Insira o arquivo no formato XLSX</td>
+    <td> <div align="left" class="style12">
+      &nbsp;  
+      <input type="file" name="Filedata" id="Filedata" />
+    </div></td>
+  </tr>
+   <tr> 
+    <td height="50" colspan="2">
+      <br /><br />
+       <div style="width:50%; float:left; text-align:center">
+   	    	<img src="../imagens/voltar.png" style="cursor:pointer" title="voltar" onclick="window.top.novo('ferramentas','body','checar_body');document.getElementById('atualiza').value='';" />
+		</div>
+   <div style="width:50%; float:left; text-align:center">
+   		<input type="image" src="../imagens/atualizar.png" name="Submit" id="button" title="Atualizar" />
+	</div>
+      
+      </td>
+  </tr>
+</table>
+</form>
+<?
+
+if($_FILES)
+{
+	
+$arquivo = "atualizacoesTemp/".date('Ymd')."-".$_SESSION['roteirizador']."-".$_SESSION['id'].".xlsx";    
+move_uploaded_file($_FILES['Filedata']['tmp_name'], $arquivo);
+$arquivoNovo = "atualizacoesTemp/".date('Ymd')."-".$_SESSION['roteirizador']."-".$_SESSION['id'].".csv";
+
+require_once 'Classes/PHPExcel/IOFactory.php';
+// IDENTIFICA O FORMADO DO ARQUIVO
+$fileType=PHPExcel_IOFactory::identify($arquivo);
+
+	
+
+$excel = PHPExcel_IOFactory::load($arquivo);
+$writer = PHPExcel_IOFactory::createWriter($excel, 'CSV');
+$writer->setDelimiter(";");
+$writer->setEnclosure("");
+$writer->setLineEnding("\n");
+$writer->save($arquivoNovo);
+
+$fp = fopen($arquivoNovo,'r');
+
+//lemos o arquivo
+$texto = fread($fp, filesize($arquivoNovo));
+$array = split("\n",$texto);
+$contador=0;
+
+$conteudoRecebido=substr($array[0],0,108);
+	
+if( ($fileType=='Excel2007') && ($conteudoRecebido=='COD_MARCA;COD_MODELO;DS_MARCA;DS_MODELO;VERSAO;COD_MARCA_FIPE;COD_MODELO_FIPE;ANO_INICIO;ANO_FIN;VH_EXCLUIDO') )
+{
+	
+############################# Cópia de segurança da tabela ###################################
+
+if(!(mysql_query("SELECT * FROM webvist.veiculo_allianz_".date('Ymd').""))) { 
+$copiarDados='sim'; 
+} else { 
+$copiarDados='nao'; 
+}
+
+if($copiarDados=='sim'){
+$sqlS1="CREATE TABLE webvist.veiculos_allianz_".date('Ymd')." (
+ cd_marca_veiculo INT( 1 ) NOT NULL ,
+ cd_modelo_veiculo INT( 7 ) NOT NULL ,
+ ds_descricao VARCHAR( 120 ) NOT NULL ,
+ nr_ano_ini INT( 4 ) NOT NULL ,
+ nr_ano_fim INT( 4 ) NOT NULL ,
+ cd_marca_fipe INT( 4 ) NOT NULL ,
+ cd_modelo_fipe INT( 4 ) NOT NULL ,
+ fabricante VARCHAR( 120 ) NOT NULL ,
+PRIMARY KEY ( `cd_marca_veiculo` , `cd_modelo_veiculo` ) ,
+KEY  idxfabricante (  fabricante ) ,
+KEY  idxmodelo (  ds_descricao )
+) ENGINE = MYISAM DEFAULT CHARSET = latin1";
+$resultS1 = mysql_query($sqlS1,$db);
+
+$sqlS2="INSERT INTO webvist.veiculos_allianz_".date('Ymd')." 
+SELECT * 
+FROM webvist.veiculos_allianz";
+$resultS2 = mysql_query($sqlS2,$db);
+}
+
+if(!(mysql_query("SELECT * FROM webvist.veiculos_allianz_".date('Ymd').""))) { 
+$copiarDados='sim'; 
+} else { 
+$copiarDados='nao'; 
+}
+
+$sqlS3="SHOW TABLES FROM webvist WHERE tables_in_webvist LIKE 'veiculos_allianz_%'";
+$resultS3 = mysql_query($sqlS3,$db);
+
+##############################################################################################
+
+
+?>
+<table width="100%" border="00" cellpadding="0" cellspacing="0" bgcolor="#F9F9F9">
+  <tr>
+    <td height="25" colspan="4" style="color:#FFF; background:#000; text-align:center; font-weight:bold">&nbsp;&nbsp;Dados da Atualiza&ccedil;&atilde;o</td>
+  </tr>
+ <? 
+ $contador=1;
+ $cont=0;
+ $contador1=1;
+ for($i=0;next($array);$i++)
+   {
+   	   $array_csv = split(";",$array[$contador]);
+	   if(strlen(trim($array_csv[2]))>=2)
+	   {
+	   
+				$sql1 = "REPLACE LOW_PRIORITY INTO veiculos_allianz  (cd_marca_veiculo,fabricante,cd_modelo_veiculo,ds_descricao,nr_ano_ini,nr_ano_fim,cd_marca_fipe,cd_modelo_fipe) 
+				VALUES (
+				'".trim($array_csv[0])."',
+				'".trim($array_csv[2])."',
+				'".trim($array_csv[1])."',
+				'".trim($array_csv[3])." ".trim($array_csv[4])."',
+				'".trim($array_csv[7])."',
+				'".trim($array_csv[8])."',
+				'".trim($array_csv[5])."',
+				'".trim($array_csv[6])."')";
+				$result2 = mysql_query($sql1,$db);
+				if (mysql_affected_rows()==1)
+				{
+					$cont++;
+				$mensagem="<span class='style3'>Adicionado</span>";
+				}elseif (mysql_affected_rows()==0){$mensagem="<span class='style3'>Erro</span>";}
+
+	   }
+$contador++;
+	if(mysql_affected_rows()==1)
+	{
+	$contador1++;
+	}
+$adicionado=$contador1-1;	
+}?>
+  <tr>
+   <td height="50" colspan="4"><center><h3>Quantidade total de ve&iacute;culos &nbsp;<? echo $cont;?>&nbsp;</h3></center></td>
+  </tr>
+</table>
+<?
+
+$obs="Quantidade total de ve&iacute;culos ".$cont;
+unlink($arquivo);
+unlink($arquivoNovo);
+}else{
+	
+	$arquivo = "atualizacoesTemp/".date('Ymd')."-".$_SESSION['roteirizador']."-".$_SESSION['id'].".vistonline";
+move_uploaded_file($_FILES['Filedata']['tmp_name'], $arquivo);
+
+	if($fileType!='Excel2007'){
+		$problemaIdentificado.='Tipo de arquivo Inválido<br>';
+		}   
+	if($conteudoRecebido!='COD_MARCA;COD_MODELO;DS_MARCA;DS_MODELO;VERSAO;COD_MARCA_FIPE;COD_MODELO_FIPE;ANO_INICIO;ANO_FIN;VH_EXCLUIDO'){
+		$problemaIdentificado.='Conte&uacute;do do arquivo inv&aacute;lido<br>';
+		}
+
+		
+	echo "<center><h1>O arquivo enviado n&atilde;o foi aceito. Motivo(s):</h1><h3><br> ".$problemaIdentificado."<br>Informe o administrador do sistema.<h3></center>";
+	
+	
+	$obs=$problemaIdentificado;
+
+	}
+
+
+##################################################### REGISTRA UPLOAD ##################################################################################
+include "../class.log.php";
+try{
+$registra = new registraLog();
+$registra->upload($_SERVER['REMOTE_ADDR'],"relatorio/","atualizar_veiculo_allianz.php",$_FILES['Filedata']["name"],$_SESSION['id'],$_SESSION['permissao'],$obs );
+}
+catch(Exception $erro)
+  {
+    echo $erro;
+  }
+#######################################################################################################################################################
+
+}
+
+
+?>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<?php
+include "../../adm/conecta.php";
+include "../verifica.php";
+?>
+
+<form action="#" method="post" enctype="multipart/form-data" name="RTEDemo">
+<table width="100%" border="00" cellpadding="0" cellspacing="0">
+  <tr>
+    <td height="50" colspan="2" style="color:#FFF; background:#000; text-align:center; font-weight:bold">&nbsp;&nbsp;Importar  Tabelas de Veiculos Porto Seguro</td>
+  </tr>
+  <tr>
+    <td height="27" colspan="2"><span class="style12">&nbsp;&nbsp;</span></td>
+  </tr>
+<TR onMouseOver="this.style.backgroundColor='#0099cc'" onMouseOut="javascript:this.style.backgroundColor=''" >
+    <td width="25%" height="30" class="style12 style15">&nbsp;&nbsp;Insira o arquivo XML </td>
+    <td> <div align="left" class="style12">
+      &nbsp;
+      <input type="file" name="Filedata" id="Filedata" />
+    </div></td>
+  </tr>
+  <tr> 
+    <td height="50" colspan="2">
+      <br /><br />
+       <div style="width:50%; float:left; text-align:center">
+   	    	<img src="../imagens/voltar.png" style="cursor:pointer" title="voltar" onclick="window.top.novo('ferramentas','body','checar_body');document.getElementById('atualiza').value='';" />
+		</div>
+   <div style="width:50%; float:left; text-align:center">
+   		<input type="image" src="../imagens/atualizar.png" name="Submit" id="button" title="Atualizar" />
+	</div>
+      </td>
+  </tr>
+
+</form>
+
+<?php
+
+preg_match('/(VP_VEIC_)[^|]{1,}/i', $_FILES['Filedata']["name"], $result);
+preg_match('/\.([0-9A-z]{1,})/i', $_FILES['Filedata']["name"], $result2);
+$nomeArquivo=$result[1];
+$extensao=$result2[1];
+
+if($_FILES)
+{
+	
+$arquivo = "atualizacoesTemp/".$_FILES['Filedata']['name'];
+move_uploaded_file($_FILES['Filedata']['tmp_name'], $arquivo);
+$fp = fopen($arquivo,'r');
+
+if( ($nomeArquivo=='VP_VEIC_') && (strtoupper($extensao)=='XML') )
+{
+	
+//$arquivo = "VP_DOM_201114.XML";
+$xml_parser = xml_parser_create();
+//if (!($fp = fopen($arquivo, "r"))) {}
+$data = fread($fp, filesize($arquivo));
+fclose($fp);
+$cont=0;
+$xml = new SimpleXMLElement(strtr($data, array("&"=>"e")));
+
+	foreach ($xml->dados as $xml_elem){
+
+				
+		foreach ($xml_elem->campo as $colunas){
+		
+		$sql_inserir = "REPLACE INTO veiculos_porto (`codveiculo`, `codmarca`, `nommarca`, `nommodelo`, `tipveiculo`, `anomodelo`, `codcombustivel`, `descombustivel`, `qtdportas`) VALUES ('".$colunas->codveiculo."','".$colunas->codmarca."','".$colunas->nommarca."','".$colunas->nommodelo."','".$colunas->tipveiculo."','".$colunas->anomodelo."','".$colunas->codcombustivel."','".$colunas->descombustivel."','".$colunas->qtdportas."')";
+		
+		$result_inserir = mysql_query($sql_inserir,$db);
+			if ($result_inserir)
+				{
+					$cont++;
+
+				}
+			}
+		
+		//print_r($sql_inserir);
+	
+	}
+
+?>
+  <tr>
+    <td height="27" colspan="4"><center><h3>Quantidade de ve&iacute;culos Atualizados&nbsp;<? echo $cont;?>&nbsp;</h3></center></td>
+  </tr>
+</table>
+<?
+$obs="Quantidade de ve&iacute;culos Atualizados ".$cont;
+unlink($arquivo);
+}else{
+	
+	$arquivo = "atualizacoesTemp/atualizar_veiculo_porto - ".$_SESSION['roteirizador'] . " - hora - ".date('H:i')." - " . $_FILES['Filedata']['name'];
+	move_uploaded_file($_FILES['Filedata']['tmp_name'], $arquivo);
+	$ponteiroArquivo = fopen($arquivo, "r");
+	
+	echo "<br /><br /><br /><center><h1>Não foi possível atualizar a tabela pois o arquivo enviado está em formato inválido.<br>Informe o administrador do sistema.<h1></center>";
+	
+	$obs="Não foi possível atualizar a tabela pois o arquivo enviado está em formato inválido.";
+	}
+
+
+##################################################### REGISTRA UPLOAD ##################################################################################
+include "../class.log.php";
+try{
+$registra = new registraLog();
+$registra->upload($_SERVER['REMOTE_ADDR'],"relatorio/","atualizar_veiculo_porto.php",$_FILES['Filedata']["name"],$_SESSION['id'],$_SESSION['permissao'],$obs );
+}
+catch(Exception $erro)
+  {
+    echo $erro;
+  }
+#######################################################################################################################################################
+
+} // FIM $_FILES
+
+exit(0);
+?>

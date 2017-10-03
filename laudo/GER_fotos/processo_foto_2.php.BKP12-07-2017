@@ -1,0 +1,143 @@
+<?php
+@session_start();
+ignore_user_abort();
+
+include "/var/www/html/adm/conecta.php";
+
+$sql = "SELECT clienteOrigem, solicitacaoOrigem FROM ".$bancoDados.".solicitacao WHERE id = " . $_GET['id'];
+$resultado = @mysql_query($sql, $db);
+$vetorResultado = @mysql_fetch_assoc($resultado);
+
+$clienteOrigem=$vetorResultado['clienteOrigem'];
+$solicitacaoOrigem=$vetorResultado['solicitacaoOrigem'];
+
+// PEGA DIRETORIO TEMPORÁRIO
+$diretorio=session_id()."/";
+
+$_SESSION["nome_seguradora"]=$_GET['seguradora'];
+
+include "/var/www/html/sistema/seguradora_nome.php";
+
+
+$nome_seg=strtr($cliente_seguradora, array(" "=>"_", " & "=>"_", "."=>"", ));
+
+// NOVO DIRETORIO ONDE SERÃO SALVO AS FOTOS
+//$novo_diretorio='../../fotos/'.date('Y').'/'.date('m').'/'.date('d').'/'.'rot_'.$rot[roteirizador].'/'.$nome_seg.'/'.$_GET[id].'/';
+$novo_diretorio='/var/www/html/sistema/PHOTOS/rot_'.$_GET['rot'].'/'.$nome_seg.'/'.date('Y').'/'.date('m').'/'.date('d').'/'.$_GET['id'].'/';
+
+if($clienteOrigem!='' || $solicitacaoOrigem!=''){
+$diretorioOrigem='/var/www/html/sistema/PHOTOS/rot_'.$clienteOrigem.'/'.$nome_seg.'/'.date('Y').'/'.date('m').'/'.date('d').'/'.$solicitacaoOrigem.'/';
+}
+
+
+// CRIANDO ARVORE DE PASTAS
+@mkdir('../../PHOTOS/', 0777);
+@mkdir('../../PHOTOS/rot_'.$_GET['rot'], 0777);
+@mkdir('../../PHOTOS/rot_'.$_GET['rot'].'/'.$nome_seg, 0777);
+@mkdir('../../PHOTOS/rot_'.$_GET['rot'].'/'.$nome_seg.'/'.date('Y'), 0777);
+@mkdir('../../PHOTOS/rot_'.$_GET['rot'].'/'.$nome_seg.'/'.date('Y').'/'.date('m'), 0777);
+@mkdir('../../PHOTOS/rot_'.$_GET['rot'].'/'.$nome_seg.'/'.date('Y').'/'.date('m').'/'.date('d'), 0777);
+@mkdir('../../PHOTOS/rot_'.$_GET['rot'].'/'.$nome_seg.'/'.date('Y').'/'.date('m').'/'.date('d').'/'.$_GET['id'], 0777);
+
+if($clienteOrigem!='' || $solicitacaoOrigem!=''){
+// CRIANDO ARVORE DE PASTAS AMBIENTE DE ORIGEM
+@mkdir('../../PHOTOS/', 0777);
+@mkdir('../../PHOTOS/rot_'.$clienteOrigem, 0777);
+@mkdir('../../PHOTOS/rot_'.$clienteOrigem.'/'.$nome_seg, 0777);
+@mkdir('../../PHOTOS/rot_'.$clienteOrigem.'/'.$nome_seg.'/'.date('Y'), 0777);
+@mkdir('../../PHOTOS/rot_'.$clienteOrigem.'/'.$nome_seg.'/'.date('Y').'/'.date('m'), 0777);
+@mkdir('../../PHOTOS/rot_'.$clienteOrigem.'/'.$nome_seg.'/'.date('Y').'/'.date('m').'/'.date('d'), 0777);
+@mkdir('../../PHOTOS/rot_'.$clienteOrigem.'/'.$nome_seg.'/'.date('Y').'/'.date('m').'/'.date('d').'/'.$solicitacaoOrigem, 0777);
+}
+
+//MOVENDO FOTOS PARA AS PASTAS CERTAS
+if($_GET["seguradora"] == 20)
+  { //Nomeia fotos no padrão Boné
+    foreach ( $_POST as $key => $value)
+      {
+	    if($value != "excluir")
+		  {
+            if(copy($diretorio.$key.'.jpg', $novo_diretorio.$_GET["id"].'_'.$value.'.jpg')){
+            $sql_fotos = "INSERT INTO ".$bancoDados.".fotos (fotos,id,data,hora) VALUES ('".$_GET["id"]."_".$value.".jpg','".$_GET["id"]."','".date('Ymd')."','".date('Hi')."')";
+            $result_fotos = mysql_query($sql_fotos,$db);
+			}
+			
+			if($clienteOrigem!='' || $solicitacaoOrigem!=''){
+				if(copy($diretorio.$key.'.jpg', $diretorioOrigem.$solicitacaoOrigem.'_'.$value.'.jpg')){
+				$sql_fotos = "INSERT INTO webvist_".$clienteOrigem.".fotos (fotos,id,data,hora) VALUES ('".$solicitacaoOrigem."_".$value.".jpg','".$solicitacaoOrigem."','".date('Ymd')."','".date('Hi')."')";
+				$result_fotos = mysql_query($sql_fotos,$db);
+				}
+				}
+			
+		  }
+        unlink($diretorio.$key.'.jpg');
+      }
+  }
+else
+  {
+    $vetorDiretorio = scandir($diretorio, 1);
+    array_pop($vetorDiretorio);
+    array_pop($vetorDiretorio);
+    
+    //print_r($chaves);
+    $quantidade = scandir($novo_diretorio);
+    array_pop($quantidade);
+    array_pop($quantidade);
+    
+    for( $i = count($quantidade), $chaves = array_keys($vetorDiretorio); false !== current($chaves); next($chaves), $i++)
+      { //print_r($chaves);
+        //var_dump($i);
+        $arquivo = $vetorDiretorio[ current($chaves) ];
+
+        if(trim($nome_seg == 'HDI')){ 
+			$nomeFoto = str_pad($_GET["id"].'_'.$i.'.jpg', 20, "0", STR_PAD_LEFT);
+			}else{ 
+				$nomeFoto = $_GET["id"].'_'.$i.'.jpg';
+				}
+		if(copy($diretorio.$arquivo, $novo_diretorio.$nomeFoto)){
+        $sql_fotos = "INSERT INTO ".$bancoDados.".fotos (fotos,id,data,hora) VALUES ('" . $nomeFoto . "', '" . $_GET["id"] . "','" . date('Ymd') . "','" . date('Hi') . "')";
+        //echo $sql_fotos."<br>";
+        $result_fotos = mysql_query($sql_fotos,$db);
+		}
+		
+		if($clienteOrigem!='' || $solicitacaoOrigem!=''){
+			
+			if(trim($nome_seg == 'HDI')){ 
+			$nomeFotoOrigem = str_pad($solicitacaoOrigem.'_'.$i.'.jpg', 20, "0", STR_PAD_LEFT);
+			}else{ 
+				$nomeFotoOrigem = $solicitacaoOrigem.'_'.$i.'.jpg';
+				}
+			if(copy($diretorio.$arquivo, $diretorioOrigem.$nomeFotoOrigem)){
+			$sql_fotos = "INSERT INTO webvist_".$clienteOrigem.".fotos (fotos,id,data,hora) VALUES ('" . $nomeFotoOrigem . "', '" . $solicitacaoOrigem . "','" . date('Ymd') . "','" . date('Hi') . "')";
+			//echo $sql_fotos."<br>";
+			$result_fotos = mysql_query($sql_fotos,$db);
+			}
+			
+			}
+		
+		unlink($diretorio.$arquivo);
+		
+			
+      }
+  }
+//O diretório precisa estar vazio.
+//$sql_atualiza_fotos = "UPDATE ".$bancoDados.".vistoria_previa1 SET INFOTOS = '1' WHERE NUMEROSOLICITACAO = '" . $_GET["id"] . "'"; 
+//$result_atualiza_fotos = mysql_query($sql_atualiza_fotos,$db);
+@rmdir($diretorio);
+
+?>
+
+    <script language=javascript>
+
+function fechar(){
+try{
+if(document.all){
+window.opener = window
+window.close("#")
+}else{
+self.close();
+}
+}catch(error){}
+}
+	  window.location='../../fotos/index_2.php?id=<? echo $_GET['id'] . $_GET["solicitacao"];?>';
+</script> 

@@ -1,0 +1,1241 @@
+<?
+set_time_limit(false);
+session_start();
+include "../../adm/conecta.php";
+include "../verifica.php";
+include "Classes/PHPExcel.php";
+include "Classes/PHPExcel/Reader/Excel2007.php";
+include "Classes/PHPExcel/Writer/Excel2007.php";
+
+$data_inicio = $_POST['data1']{6}.$_POST['data1']{7}.$_POST['data1']{8}.$_POST['data1']{9}.$_POST['data1']{3}.$_POST['data1']{4}.$_POST['data1']{0}.$_POST['data1']{1};
+$data_fim = $_POST['data2']{6}.$_POST['data2']{7}.$_POST['data2']{8}.$_POST['data2']{9}.$_POST['data2']{3}.$_POST['data2']{4}.$_POST['data2']{0}.$_POST['data2']{1};
+
+   
+################ CRIAÇÃO DE TABELAS TEMPORÁRIAS ###############################
+
+//Estrutura da tabela TEMPORARIA 'solicitacao'
+$sql_temp = "CREATE TABLE IF NOT EXISTS ".$bancoDados.".solicitacao_temp (
+  cliente varchar(22) NOT NULL,
+  status int(1) NOT NULL,
+  data_auto varchar(10) NOT NULL,
+  motivo varchar(70) NOT NULL,
+  regional varchar(50) NOT NULL,
+  sucursal varchar(30) NOT NULL,
+  corretor varchar(60) NOT NULL,
+  numero_susep varchar(22) NOT NULL,
+  cep1 varchar(8) NOT NULL,
+  cep2 varchar(8) NOT NULL,
+  estado varchar(2) NOT NULL,
+  cidade varchar(70) NOT NULL,
+  cidadeRecebida varchar(70) NOT NULL,
+  endereco varchar(70) NOT NULL,
+  numero int(10) NOT NULL,
+  bairro varchar(70) NOT NULL,
+  complemento varchar(80) NOT NULL,
+  nome_c varchar(100) NOT NULL,
+  cpf_cnpj varchar(17) NOT NULL,
+  tel1 varchar(25) NOT NULL,
+  tel2 varchar(70) NOT NULL,
+  ramal varchar(20) NOT NULL,
+  placa varchar(8) NOT NULL,
+  placaRecebida varchar(8) NOT NULL,
+  chassi varchar(50) NOT NULL,
+  marca_modelo varchar(100) NOT NULL,
+  ano_fabricacao int(4) NOT NULL,
+  cor varchar(10) NOT NULL,
+  ano_modelo int(4) NOT NULL,
+  nome_s varchar(100) NOT NULL,
+  telefone1 varchar(25) NOT NULL,
+  telefone2 varchar(40) NOT NULL,
+  email varchar(200) NOT NULL,
+  obs varchar(500) NOT NULL,
+  id int(20) NOT NULL, 
+  checado varchar(1) NOT NULL,
+  controle_prest varchar(5) NOT NULL,
+  controle_digitador int(5) NOT NULL,
+  data_envio_para_prestador varchar(10) NOT NULL,
+  modelo varchar(60) NOT NULL,
+  marca varchar(40) NOT NULL,
+  grupo varchar(4) NOT NULL,
+  cota varchar(3) NOT NULL,
+  agencia varchar(5) NOT NULL,
+  nome_agencia varchar(60) NOT NULL,
+  hora varchar(10) NOT NULL,
+  hora_marcada varchar(10) NOT NULL,
+  dia int(8) NOT NULL,
+  realizada int(1) NOT NULL,
+  vistoria int(1) NOT NULL,
+  cod_veiculo varchar(14) NOT NULL,
+  impressora int(1) NOT NULL,
+  laudo int(1) NOT NULL,
+  agendamento varchar(8) NOT NULL,
+  maritima int(14) NOT NULL,
+  contato varchar(40) NOT NULL,
+  POSTOFIXO int(5) NOT NULL,
+  serie int(6) NOT NULL,
+  proposta varchar(30) NOT NULL,
+  numero_item int(4) NOT NULL,
+  numero_inspecao varchar(20) NOT NULL,
+  data_validade_inspecao varchar(8) NOT NULL,
+  local_inspecao varchar(20) NOT NULL,
+  instrucoes varchar(255) NOT NULL,
+  fone_residencial varchar(20) NOT NULL,
+  fone_comercial varchar(20) NOT NULL,
+  celular varchar(25) NOT NULL,
+  fone_preferencial varchar(12) NOT NULL,
+  cd_corretor varchar(18) NOT NULL,
+  tel_corretor varchar(12) NOT NULL,
+  impresso_por int(6) NOT NULL,
+  nome_recebe_perito varchar(60) NOT NULL,
+  digito_controle_cdc varchar(3) NOT NULL,
+  numero_agendamento varchar(15) NOT NULL,
+  numero_laudo_informado varchar(20) NOT NULL,
+  custo_sol_itauseg varchar(15) NOT NULL,
+  tipo_pessoa varchar(1) NOT NULL,
+  confirma_torpedo int(6) NOT NULL,
+  protocolo varchar(70) NOT NULL,
+  LOG varchar(200) NOT NULL,
+  status_laudo int(1) NOT NULL,
+  laudo_ok_itau_pda int(7) NOT NULL,
+  baixou_pda varchar(13) NOT NULL,
+  roteirizador int(6) NOT NULL,
+  dia_semana varchar(10) NOT NULL,
+  apolice varchar(60) NOT NULL,
+  laudo_entregue int(1) NOT NULL,
+  numero_mapfre varchar(20) NOT NULL,
+  status_mitsui int(1) NOT NULL,
+  resultado_mitsui varchar(200) NOT NULL,
+  avisado int(1) NOT NULL,
+  km_veiculo varchar(10) NOT NULL,
+  cod_fipe int(10) NOT NULL,
+  tipo_solicitante varchar(20) NOT NULL,
+  atendente_bradesco varchar(40) NOT NULL,
+  data_atendi_bradesco varchar(30) NOT NULL,
+  voucher varchar(20) NOT NULL,
+  operadora int(2) NOT NULL,
+  operadora1 int(2) NOT NULL,
+  operadora2 int(2) NOT NULL,
+  operadora3 int(2) NOT NULL,
+  operadora4 int(2) NOT NULL,
+  ramal1 varchar(10) NOT NULL,
+  ramal2 varchar(10) NOT NULL,
+  ramal3 varchar(10) NOT NULL,
+  ramal4 varchar(10) NOT NULL,
+  chave varchar(200) NOT NULL,
+  tipo int(1) NOT NULL,
+  plano int(1) NOT NULL,
+  hora_criacao int(4) NOT NULL,
+  audatex int(1) NOT NULL,
+  numero_bradesco varchar(20) NOT NULL,
+  pda int(11) NOT NULL,
+  arquivo_mitsui varchar(30) NOT NULL,
+  avisado_prest varchar(6) NOT NULL,
+  avisado_prest_date varchar(16) NOT NULL,
+  controle_alteracao int(8) NOT NULL,
+  hora_alteracao int(4) NOT NULL,
+  data_alteracao int(8) NOT NULL,
+  nrvistoria int(10) NOT NULL,
+  periodo_solicitacao varchar(22) NOT NULL,
+  controle_prest_filho varchar(5) NOT NULL,
+  CDCIA varchar(4) NOT NULL,
+  numero_cliente_bone varchar(20) NOT NULL,
+  cliente_bone varchar(80) NOT NULL,
+  situacao varchar(5) NOT NULL,
+  PRIMARY KEY (id)
+) ENGINE=MEMORY  DEFAULT CHARSET=latin1;";	
+$result_temp = mysql_query($sql_temp,$db);
+
+//Estrutura da tabela 'frustada'
+$sql_temp1 = "CREATE TABLE IF NOT EXISTS ".$bancoDados.".frustada_temp (
+  id varchar(10) NOT NULL,
+  mensagem varchar(800) NOT NULL,
+  foto varchar(100) NOT NULL,
+  data varchar(8) NOT NULL,
+  hora varchar(8) NOT NULL,
+  controle_digitador int(6) NOT NULL,
+  controle_alteracao int(6) NOT NULL,
+  data_alteracao int(8) NOT NULL,
+  hora_alteracao int(8) NOT NULL,
+  situacao varchar(10) NOT NULL,
+  motivo varchar(10) NOT NULL,
+  filial varchar(20) NOT NULL,
+  data_dut int(8) NOT NULL,
+  data_cadastro_vistoria int(8) NOT NULL,
+  controle_digitador_filho varchar(6) NOT NULL,
+  dataOcorrencia int(8) NOT NULL,
+  horaOcorrencia int(4) NOT NULL,
+  editado int(11) NOT NULL,
+  PRIMARY KEY (id)
+) ENGINE=MEMORY DEFAULT CHARSET=latin1;";	
+$result_temp1 = mysql_query($sql_temp1,$db);
+     
+//Estrutura da tabela 'fotos'
+$sql_temp3 = "CREATE TABLE IF NOT EXISTS ".$bancoDados.".fotos_temp (
+  fotos varchar(100) NOT NULL,
+  id int(20) NOT NULL,
+  laudo int(10) NOT NULL,
+  contagem int(10) NOT NULL,
+  data varchar(8) NOT NULL,
+  hora int(4) NOT NULL,
+  seqFotoMobile int(11) NOT NULL,
+  PRIMARY KEY (id)
+) ENGINE=MEMORY  DEFAULT CHARSET=latin1;";	
+$result_temp3 = mysql_query($sql_temp3,$db);
+
+###############################################################################
+
+################### INSERINDO DADOS NAS TABELAS TEMPORARIAS ###################
+
+$sql_inserir = "INSERT IGNORE INTO ".$bancoDados.".solicitacao_temp (cliente,status,data_auto,motivo,regional,sucursal,corretor,numero_susep,cep1,cep2,estado,cidade,cidadeRecebida,endereco,numero,bairro,complemento,nome_c,cpf_cnpj,tel1,tel2,ramal,placa,placaRecebida,chassi,marca_modelo,ano_fabricacao,cor,ano_modelo,nome_s,telefone1,telefone2,email,obs,id,checado,controle_prest,controle_digitador,data_envio_para_prestador,modelo,marca,grupo,cota,agencia,nome_agencia,hora,hora_marcada,dia,realizada,vistoria,cod_veiculo,impressora,laudo,agendamento,maritima,contato,POSTOFIXO,serie,proposta,numero_item,numero_inspecao,data_validade_inspecao,local_inspecao,instrucoes,fone_residencial,fone_comercial,celular,fone_preferencial,cd_corretor,tel_corretor,impresso_por,nome_recebe_perito,digito_controle_cdc,numero_agendamento,numero_laudo_informado,custo_sol_itauseg,tipo_pessoa,confirma_torpedo,protocolo,LOG,status_laudo,laudo_ok_itau_pda,baixou_pda,roteirizador,dia_semana,apolice,laudo_entregue,numero_mapfre,status_mitsui,resultado_mitsui,avisado,km_veiculo,cod_fipe,tipo_solicitante,atendente_bradesco,data_atendi_bradesco,voucher,operadora,operadora1,operadora2,operadora3,operadora4,ramal1,ramal2,ramal3,ramal4,chave,tipo,plano,hora_criacao,audatex,numero_bradesco,pda,arquivo_mitsui,avisado_prest,avisado_prest_date,controle_alteracao,hora_alteracao,data_alteracao,nrvistoria,periodo_solicitacao,controle_prest_filho,CDCIA,numero_cliente_bone,cliente_bone,situacao) SELECT * FROM ".$bancoDados.".solicitacao WHERE dia>=".$data_inicio." AND dia<=".$data_fim." AND roteirizador=".$_SESSION['roteirizador']." AND checado=2";	
+$result_inserir = mysql_query($sql_inserir,$db);
+
+$sql_inserir2 = "INSERT IGNORE INTO ".$bancoDados.".frustada_temp (id,mensagem,foto,data,hora,controle_digitador,controle_alteracao,data_alteracao,hora_alteracao,situacao,motivo,filial,data_dut,data_cadastro_vistoria,controle_digitador_filho,dataOcorrencia,horaOcorrencia,editado) SELECT * FROM ".$bancoDados.".frustada WHERE data>=".$data_inicio." AND data<=".date('Ymd')."";	
+$result_inserir2 = mysql_query($sql_inserir2,$db);
+
+$sql_inserir4 = "INSERT IGNORE INTO ".$bancoDados.".fotos_temp (fotos,id,laudo,contagem,data,hora,seqFotoMobile) SELECT f.fotos,f.id,f.laudo,f.contagem,f.data,f.hora,f.seqFotoMobile FROM ".$bancoDados.".fotos f, ".$bancoDados.".solicitacao s WHERE f.id=s.id and s.checado=2 AND s.roteirizador=".$_SESSION['roteirizador']." AND s.dia>=".$data_inicio." AND s.dia<=".date('Ymd')."";	
+$result_inserir4 = mysql_query($sql_inserir4,$db);
+
+###############################################################################
+
+if($_SESSION['id']==1){
+	//echo "pediu para parar, parou!";
+	//exit();
+	}
+function downloadFile( $fullPath ){ 
+
+  // Must be fresh start 
+  if( headers_sent() ) 
+    die('Headers Sent'); 
+
+  // Required for some browsers 
+  if(ini_get('zlib.output_compression')) 
+    ini_set('zlib.output_compression', 'Off'); 
+
+  // File Exists? 
+  if( file_exists($fullPath) ){ 
+    
+    // Parse Info / Get Extension 
+    $fsize = filesize($fullPath); 
+    $path_parts = pathinfo($fullPath); 
+    $ext = strtolower($path_parts["extension"]); 
+    
+    // Determine Content Type 
+    switch ($ext) { 
+      case "pdf": $ctype="application/pdf"; break; 
+      case "exe": $ctype="application/octet-stream"; break; 
+      case "zip": $ctype="application/zip"; break; 
+      case "doc": $ctype="application/msword"; break; 
+      case "xls": $ctype="application/vnd.ms-excel"; break; 
+      case "ppt": $ctype="application/vnd.ms-powerpoint"; break; 
+      case "gif": $ctype="image/gif"; break; 
+      case "png": $ctype="image/png"; break; 
+      case "jpeg": 
+      case "jpg": $ctype="image/jpg"; break; 
+      default: $ctype="application/force-download"; 
+    } 
+
+    header("Pragma: public"); // required 
+    header("Expires: 0"); 
+    header("Cache-Control: must-revalidate, post-check=0, pre-check=0"); 
+    header("Cache-Control: private",false); // required for certain browsers 
+    header("Content-Type: $ctype"); 
+    header("Content-Disposition: attachment; filename=\"".basename($fullPath)."\";" ); 
+    header("Content-Transfer-Encoding: binary"); 
+    header("Content-Length: ".$fsize); 
+    ob_clean(); 
+    flush(); 
+    readfile( $fullPath ); 
+
+  } else 
+    die('File Not Found'); 
+
+} 
+
+$objReader = PHPExcel_IOFactory::createReader('Excel2007');
+$objPHPExcel = $objReader->load("template/modelo_frustrada".$_SESSION['roteirizador'].".xlsx");
+
+$objPHPExcel->getProperties()->setCreator("Robson Souza Cassiano")
+    						 ->setLastModifiedBy("Robson Souza Cassiano")
+							 ->setTitle("Relatorio")
+							 ->setSubject("Solicitaoes Frustradas")
+							 ->setDescription("Documento gerado pelo sistema VistOn-Line")
+							 ->setKeywords("office 2007 openxml php")
+							 ->setCategory("import logs call");
+							 
+
+
+//////////////////////////////////////////////// C A B E Ç A L H O  ////////////////////////////////////////////////////////
+
+$periodo = $_POST['data1'] . ' - ' . $_POST['data2'];
+
+	$objPHPExcel->setActiveSheetIndex(0)->setCellValue('E4', $periodo);
+	$objPHPExcel->setActiveSheetIndex(1)->setCellValue('E4', $periodo);
+	$objPHPExcel->setActiveSheetIndex(2)->setCellValue('E4', $periodo);
+	$objPHPExcel->setActiveSheetIndex(3)->setCellValue('E4', $periodo);
+	$objPHPExcel->setActiveSheetIndex(4)->setCellValue('E4', $periodo);
+	$objPHPExcel->setActiveSheetIndex(5)->setCellValue('E4', $periodo);
+	$objPHPExcel->setActiveSheetIndex(6)->setCellValue('E4', $periodo);
+	$objPHPExcel->setActiveSheetIndex(7)->setCellValue('E4', $periodo);
+	$objPHPExcel->setActiveSheetIndex(8)->setCellValue('E4', $periodo);
+	$objPHPExcel->setActiveSheetIndex(9)->setCellValue('E4', $periodo);
+	$objPHPExcel->setActiveSheetIndex(10)->setCellValue('E4', $periodo);
+	$objPHPExcel->setActiveSheetIndex(11)->setCellValue('E4', $periodo);
+	$objPHPExcel->setActiveSheetIndex(12)->setCellValue('E4', $periodo);
+	$objPHPExcel->setActiveSheetIndex(13)->setCellValue('E4', $periodo);
+	$objPHPExcel->setActiveSheetIndex(14)->setCellValue('E4', $periodo);
+
+
+/////////////////////////////////////////////// F I M     C A B E Ç A L H O  ////////////////////////////////////////////////////////
+
+$base = 8;
+$cont0 = 0;
+$cont1 = 0;
+$cont2 = 0;
+$cont3 = 0;
+$cont4 = 0;
+$cont5 = 0;
+$cont6 = 0;
+$cont7 = 0;
+$cont8 = 0;
+$cont9 = 0;
+$cont10 = 0;
+$cont11 = 0;
+$cont12 = 0;
+$cont13 = 0;
+$cont14 = 0;
+$cont50 = 0;
+
+
+$sql1 = "SELECT s.cliente,s.dia,s.id,s.proposta,s.agendamento,s.numero_inspecao ,s.numero_mapfre,s.numero_laudo_informado,s.nome_c,s.cidade,s.estado,s.modelo,s.marca_modelo,s.placa,s.chassi,s.numero_susep,s.cd_corretor,s.corretor, u.nome, u.filial, f.data, f.hora, f.mensagem FROM ".$bancoDados.".solicitacao_temp s, ".$bancoDados.".frustada_temp f, ".$bancoDados.".user u WHERE s.id=RIGHT(f.id,8) AND s.controle_prest=u.id AND s.roteirizador=".$_SESSION['roteirizador']." AND s.checado=2 AND s.dia>=".$data_inicio." AND s.dia<=".$data_fim." AND f.motivo!='80' 
+UNION 
+SELECT s.cliente, s.dia, f.id, s.proposta, s.agendamento, s.numero_inspecao, s.numero_mapfre, s.numero_laudo_informado, s.nome_c, s.cidade, s.estado, s.modelo, s.marca_modelo, s.placa, s.chassi, s.numero_susep, s.cd_corretor, s.corretor, u.nome, u.filial, f.data, f.hora, f.mensagem
+FROM ".$bancoDados.".solicitacao s, ".$bancoDados.".frustada_temp f, ".$bancoDados.".user u
+WHERE s.id = RIGHT( f.id, 8 ) 
+AND s.controle_prest = u.id
+AND s.roteirizador =".$_SESSION['roteirizador']."
+AND LEFT( f.id, 2 ) =  '#_'
+AND f.motivo!= '80'"; 
+$result_sql1 = mysql_query($sql1,$db);
+
+while ($array = @mysql_fetch_array($result_sql1)){
+
+//verifica se tem foto
+$sql_foto = "SELECT fotos FROM ".$bancoDados.".fotos_temp WHERE id=".$array['id']." ";
+$result_sql_foto = mysql_query($sql_foto ,$db);
+$result_foto = @mysql_fetch_array($result_sql_foto);
+
+//verifica filial
+$sql_filial = "SELECT nome_filial FROM ".$bancoDados.".controle_vp_filial WHERE codigo_filial=".$array['filial']." ";
+$result_sql_filial = mysql_query($sql_filial ,$db);
+$result_filial = @mysql_fetch_array($result_sql_filial);
+
+if($result_foto['fotos']!=''){
+	$foto="SIM";
+	}else{
+		$foto="NÃO";
+		}
+		
+$data = $array['dia']{6}.$array['dia']{7}."/".$array['dia']{4}.$array['dia']{5}."/".$array['dia']{0}.$array['dia']{1}.$array['dia']{2}.$array['dia']{3};	
+$data_frustrada = $array['data']{6}.$array['data']{7}."/".$array['data']{4}.$array['data']{5}."/".$array['data']{0}.$array['data']{1}.$array['data']{2}.$array['data']{3};
+
+
+ if (  $array['cliente']== 'ALFA SEGUROS')//SEGURADORA ALFA SEGUROS   utf8_encode()
+      {
+
+		$vetor0[] = Array($cont0 => Array(
+                                  "A" => $cont0+1,
+                                  "B" => $array['id'], 
+								  "C" => strtoupper($array['proposta']),
+								  "D" => utf8_encode($foto),
+                                  "E" => strtoupper($array['nome_c']),
+                                  "F" => $data,
+                                  "G" => $array['numero_susep'],
+								  "H" => strtoupper(utf8_encode($array['corretor'])),
+								  "I" => utf8_encode($array['modelo']),
+								  "J" => strtoupper($array['placa']),
+								  "K" => strtoupper($array['chassi']),
+								  "L" => strtoupper(utf8_encode($array['nome'])),
+								  "M" => strtoupper(utf8_encode($array['cidade'])),
+								  "N" => strtoupper(utf8_encode($result_filial['nome_filial'])),
+								  "O" => strtoupper($array['estado']),
+								  "P" => $data_frustrada,
+								  "Q" => strtoupper($array['hora']),
+								  "R" => strtoupper(utf8_encode(urldecode($array['mensagem'])))
+                               ));
+
+        $cont0++;
+
+	  } //FIM (IF) SEGURADORA ALFA SEGUROS
+	  
+	 elseif ($array['cliente']=='ALLIANZ')//SEGURADORA ALLIANZ
+      {
+
+		$vetor1[] = Array($cont1 => Array(
+                                  "A" => $cont1+1,
+                                  "B" => $array['id'], 
+								  "C" => strtoupper($array['proposta']),
+								  "D" => utf8_encode($foto),
+                                  "E" => strtoupper(utf8_encode($array['nome_c'])),
+                                  "F" => $data,
+                                  "G" => $array['numero_susep'],
+								  "H" => strtoupper(utf8_encode($array['corretor'])),
+								  "I" => utf8_encode($array['modelo']),
+								  "J" => strtoupper($array['placa']),
+								  "K" => strtoupper($array['chassi']),
+								  "L" => strtoupper(utf8_encode($array['nome'])),
+								  "M" => strtoupper(utf8_encode($array['cidade'])),
+								  "N" => strtoupper(utf8_encode($result_filial['nome_filial'])),
+								  "O" => strtoupper($array['estado']),
+								  "P" => $data_frustrada,
+								  "Q" => strtoupper($array['hora']),
+								  "R" => strtoupper(utf8_encode(urldecode($array['mensagem'])))
+                               ));
+
+        $cont1++;
+
+	  } //FIM (IF) SEGURADORA ALLIANZ
+	  
+	   elseif ($array['cliente']=='BB SEGUROS')//SEGURADORA BB SEGUROS
+      {
+
+		$vetor2[] = Array($cont2 => Array(
+                                  "A" => $cont2+1,
+                                  "B" => $array['id'], 
+								  "C" => strtoupper($array['proposta']),
+								  "D" => utf8_encode($foto),
+                                  "E" => strtoupper(utf8_encode($array['nome_c'])),
+                                  "F" => $data,
+                                  "G" => $array['numero_susep'],
+								  "H" => strtoupper(utf8_encode($array['corretor'])),
+								  "I" => utf8_encode($array['modelo']),
+								  "J" => strtoupper($array['placa']),
+								  "K" => strtoupper($array['chassi']),
+								  "L" => strtoupper(utf8_encode($array['nome'])),
+								  "M" => strtoupper(utf8_encode($array['cidade'])),
+								  "N" => strtoupper(utf8_encode($result_filial['nome_filial'])),
+								  "O" => strtoupper($array['estado']),
+								  "P" => $data_frustrada,
+								  "Q" => strtoupper($array['hora']),
+								  "R" => strtoupper(utf8_encode(urldecode($array['mensagem'])))
+                               ));
+
+        $cont2++;
+
+	  } //FIM (IF) BB SEGUROS
+	  
+	  elseif ($array['cliente']=='CAIXA SEGURADORA')//SEGURADORA CAIXA SEGURADORA
+      {
+
+		$vetor3[] = Array($cont3 => Array(
+                                  "A" => $cont3+1,
+                                  "B" => $array['id'], 
+								  "C" => strtoupper($array['numero_mapfre']),
+								  "D" => utf8_encode($foto),
+                                  "E" => strtoupper(utf8_encode($array['nome_c'])),
+                                  "F" => $data,
+                                  "G" => $array['numero_susep'],
+								  "H" => strtoupper(utf8_encode($array['corretor'])),
+								  "I" => utf8_encode($array['modelo']),
+								  "J" => strtoupper($array['placa']),
+								  "K" => strtoupper($array['chassi']),
+								  "L" => strtoupper(utf8_encode($array['nome'])),
+								  "M" => strtoupper(utf8_encode($array['cidade'])),
+								  "N" => strtoupper(utf8_encode($result_filial['nome_filial'])),
+								  "O" => strtoupper($array['estado']),
+								  "P" => $data_frustrada,
+								  "Q" => strtoupper($array['hora']),
+								  "R" => strtoupper(utf8_encode(urldecode($array['mensagem'])))
+                               ));
+
+        $cont3++;
+
+	  } //FIM (IF) CAIXA SEGURADORA
+	  
+	  elseif ($array['cliente']=='HDI')//SEGURADORA HDI
+      {
+
+		$vetor4[] = Array($cont4 => Array(
+                                  "A" => $cont4+1,
+                                  "B" => $array['id'], 
+								  "C" => strtoupper($array['proposta']),
+								  "D" => utf8_encode($foto),
+                                  "E" => strtoupper(utf8_encode($array['nome_c'])),
+                                  "F" => $data,
+                                  "G" => $array['numero_susep'],
+								  "H" => strtoupper(utf8_encode($array['corretor'])),
+								  "I" => utf8_encode($array['modelo']),
+								  "J" => strtoupper($array['placa']),
+								  "K" => strtoupper($array['chassi']),
+								  "L" => strtoupper(utf8_encode($array['nome'])),
+								  "M" => strtoupper(utf8_encode($array['cidade'])),
+								  "N" => strtoupper(utf8_encode($result_filial['nome_filial'])),
+								  "O" => strtoupper($array['estado']),
+								  "P" => $data_frustrada,
+								  "Q" => strtoupper($array['hora']),
+								  "R" => strtoupper(utf8_encode(urldecode($array['mensagem'])))
+                               ));
+
+        $cont4++;
+
+	  } //FIM (IF) HDI
+	  
+	  elseif ($array['cliente']=='MAPFRE SEGUROS')//SEGURADORA MAPFRE SEGUROS
+      {
+
+		$vetor5[] = Array($cont5 => Array(
+                                  "A" => $cont5+1,
+                                  "B" => $array['id'], 
+								  "C" => strtoupper($array['numero_mapfre']),
+								  "D" => utf8_encode($foto),
+                                  "E" => strtoupper(utf8_encode($array['nome_c'])),
+                                  "F" => $data,
+                                  "G" => $array['numero_susep'],
+								  "H" => strtoupper(utf8_encode($array['corretor'])),
+								  "I" => utf8_encode($array['modelo']),
+								  "J" => strtoupper($array['placa']),
+								  "K" => strtoupper($array['chassi']),
+								  "L" => strtoupper(utf8_encode($array['nome'])),
+								  "M" => strtoupper(utf8_encode($array['cidade'])),
+								  "N" => strtoupper(utf8_encode($result_filial['nome_filial'])),
+								  "O" => strtoupper($array['estado']),
+								  "P" => $data_frustrada,
+								  "Q" => strtoupper($array['hora']),
+								  "R" => strtoupper(utf8_encode(urldecode($array['mensagem'])))
+                               ));
+
+        $cont5++;
+
+	  } //FIM (IF) MAPFRE SEGUROS
+	  
+	  elseif ($array['cliente']==' WARRANTY')//SEGURADORA  WARRANTY
+      {
+
+		$vetor6[] = Array($cont6 => Array(
+                                  "A" => $cont6+1,
+                                  "B" => $array['id'], 
+								  "C" => strtoupper($array['numero_mapfre']),
+								  "D" => utf8_encode($foto),
+                                  "E" => strtoupper(utf8_encode($array['nome_c'])),
+                                  "F" => $data,
+                                  "G" => $array['numero_susep'],
+								  "H" => strtoupper(utf8_encode($array['corretor'])),
+								  "I" => utf8_encode($array['modelo']),
+								  "J" => strtoupper($array['placa']),
+								  "K" => strtoupper($array['chassi']),
+								  "L" => strtoupper(utf8_encode($array['nome'])),
+								  "M" => strtoupper(utf8_encode($array['cidade'])),
+								  "N" => strtoupper(utf8_encode($result_filial['nome_filial'])),
+								  "O" => strtoupper($array['estado']),
+								  "P" => $data_frustrada,
+								  "Q" => strtoupper($array['hora']),
+								  "R" => strtoupper(utf8_encode(urldecode($array['mensagem'])))
+                               ));
+
+        $cont6++;
+
+	  } //FIM (IF) MAPFRE  WARRANTY
+	  
+	  elseif ($array['cliente']=='MITSUI')//SEGURADORA MITSUI
+      {
+
+		$vetor7[] = Array($cont7 => Array(
+                                  "A" => $cont7+1,
+                                  "B" => $array['id'], 
+								  "C" => strtoupper($array['numero_inspecao']),
+								  "D" => utf8_encode($foto),
+                                  "E" => strtoupper(utf8_encode($array['nome_c'])),
+                                  "F" => $data,
+                                  "G" => $array['cd_corretor'],
+								  "H" => strtoupper(utf8_encode($array['corretor'])),
+								  "I" => utf8_encode($array['marca_modelo']),
+								  "J" => strtoupper($array['placa']),
+								  "K" => strtoupper($array['chassi']),
+								  "L" => strtoupper(utf8_encode($array['nome'])),
+								  "M" => strtoupper(utf8_encode($array['cidade'])),
+								  "N" => strtoupper(utf8_encode($result_filial['nome_filial'])),
+								  "O" => strtoupper($array['estado']),
+								  "P" => $data_frustrada,
+								  "Q" => strtoupper($array['hora']),
+								  "R" => strtoupper(utf8_encode(urldecode($array['mensagem'])))
+                               ));
+
+        $cont7++;
+
+	  } //FIM (IF) MITSUI
+	  
+	  elseif ($array['cliente']=='NOBRE')//SEGURADORA NOBRE
+      {
+
+		$vetor8[] = Array($cont8 => Array(
+                                  "A" => $cont8+1,
+                                  "B" => $array['id'], 
+								  "C" => strtoupper($array['proposta']),
+								  "D" => utf8_encode($foto),
+                                  "E" => strtoupper(utf8_encode($array['nome_c'])),
+                                  "F" => $data,
+                                  "G" => $array['numero_susep'],
+								  "H" => strtoupper(utf8_encode($array['corretor'])),
+								  "I" => utf8_encode($array['modelo']),
+								  "J" => strtoupper($array['placa']),
+								  "K" => strtoupper($array['chassi']),
+								  "L" => strtoupper(utf8_encode($array['nome'])),
+								  "M" => strtoupper(utf8_encode($array['cidade'])),
+								  "N" => strtoupper(utf8_encode($result_filial['nome_filial'])),
+								  "O" => strtoupper($array['estado']),
+								  "P" => $data_frustrada,
+								  "Q" => strtoupper($array['hora']),
+								  "R" => strtoupper(utf8_encode(urldecode($array['mensagem'])))
+                               ));
+
+        $cont8++;
+
+	  } //FIM (IF) NOBRE
+	  
+	  elseif ($array['cliente']=='ZURICH')//SEGURADORA ZURICH
+      {
+
+		$vetor9[] = Array($cont9 => Array(
+                                  "A" => $cont9+1,
+                                  "B" => $array['id'], 
+								  "C" => strtoupper($array['numero_laudo_informado']),
+								  "D" => utf8_encode($foto),
+                                  "E" => strtoupper(utf8_encode($array['nome_c'])),
+                                  "F" => $data,
+                                  "G" => $array['cd_corretor'],
+								  "H" => strtoupper(utf8_encode($array['corretor'])),
+								  "I" => utf8_encode($array['modelo']),
+								  "J" => strtoupper($array['placa']),
+								  "K" => strtoupper($array['chassi']),
+								  "L" => strtoupper(utf8_encode($array['nome'])),
+								  "M" => strtoupper(utf8_encode($array['cidade'])),
+								  "N" => strtoupper(utf8_encode($result_filial['nome_filial'])),
+								  "O" => strtoupper($array['estado']),
+								  "P" => $data_frustrada,
+								  "Q" => strtoupper($array['hora']),
+								  "R" => strtoupper(utf8_encode(urldecode($array['mensagem'])))
+                               ));
+
+        $cont9++;
+
+	  } //FIM (IF) ZURICH
+	  
+	  elseif ($array['cliente']=='Bradesco Seguros')//SEGURADORA Bradesco Seguros
+      {
+
+		$vetor10[] = Array($cont10 => Array(
+                                  "A" => $cont10+1,
+                                  "B" => $array['id'], 
+								  "C" => strtoupper($array['proposta']),
+								  "D" => utf8_encode($foto),
+                                  "E" => strtoupper(utf8_encode($array['nome_c'])),
+                                  "F" => $data,
+                                  "G" => $array['numero_susep'],
+								  "H" => strtoupper(utf8_encode($array['corretor'])),
+								  "I" => utf8_encode($array['modelo']),
+								  "J" => strtoupper($array['placa']),
+								  "K" => strtoupper($array['chassi']),
+								  "L" => strtoupper(utf8_encode($array['nome'])),
+								  "M" => strtoupper(utf8_encode($array['cidade'])),
+								  "N" => strtoupper(utf8_encode($result_filial['nome_filial'])),
+								  "O" => strtoupper($array['estado']),
+								  "P" => $data_frustrada,
+								  "Q" => strtoupper($array['hora']),
+								  "R" => strtoupper(utf8_encode(urldecode($array['mensagem'])))
+                               ));
+
+        $cont10++;
+
+	  } //FIM (IF) Bradesco Seguros
+	  
+	  elseif ($array['cliente']=='MARITIMA')//SEGURADORA MARITIMA
+      {
+
+		$vetor12[] = Array($cont12 => Array(
+                                  "A" => $cont12+1,
+                                  "B" => $array['id'], 
+								  "C" => strtoupper($array['numero_inspecao']),
+								  "D" => utf8_encode($foto),
+                                  "E" => strtoupper(utf8_encode($array['nome_c'])),
+                                  "F" => $data,
+                                  "G" => $array['numero_susep'],
+								  "H" => strtoupper(utf8_encode($array['corretor'])),
+								  "I" => utf8_encode($array['modelo']),
+								  "J" => strtoupper($array['placa']),
+								  "K" => strtoupper($array['chassi']),
+								  "L" => strtoupper(utf8_encode($array['nome'])),
+								  "M" => strtoupper(utf8_encode($array['cidade'])),
+								  "N" => strtoupper(utf8_encode($result_filial['nome_filial'])),
+								  "O" => strtoupper($array['estado']),
+								  "P" => $data_frustrada,
+								  "Q" => strtoupper($array['hora']),
+								  "R" => strtoupper(utf8_encode(urldecode($array['mensagem'])))
+                               ));
+
+        $cont12++;
+
+	  } //FIM (IF) MARITIMA  
+	  
+	   elseif ($array['cliente']=='SUL AMERICA')//SEGURADORA SUL AMERICA
+      {
+
+		$vetor13[] = Array($cont13 => Array(
+                                  "A" => $cont13+1,
+                                  "B" => $array['id'], 
+								  "C" => strtoupper($array['proposta']),
+								  "D" => utf8_encode($foto),
+                                  "E" => strtoupper(utf8_encode($array['nome_c'])),
+                                  "F" => $data,
+                                  "G" => $array['cd_corretor'],
+								  "H" => strtoupper(utf8_encode($array['corretor'])),
+								  "I" => utf8_encode($array['modelo']),
+								  "J" => strtoupper($array['placa']),
+								  "K" => strtoupper($array['chassi']),
+								  "L" => strtoupper(utf8_encode($array['nome'])),
+								  "M" => strtoupper(utf8_encode($array['cidade'])),
+								  "N" => strtoupper(utf8_encode($result_filial['nome_filial'])),
+								  "O" => strtoupper($array['estado']),
+								  "P" => $data_frustrada,
+								  "Q" => strtoupper($array['hora']),
+								  "R" => strtoupper(utf8_encode(urldecode($array['mensagem'])))
+                               ));
+
+        $cont13++;
+
+	  } //FIM (IF) SUL AMERICA
+	  
+	  elseif ($array['cliente']=='LIBERTY')//SEGURADORA LIBERTY
+      {
+
+		$vetor14[] = Array($cont14 => Array(
+                                  "A" => $cont14+1,
+                                  "B" => $array['id'], 
+								  "C" => strtoupper($array['agendamento']),
+								  "D" => utf8_encode($foto),
+                                  "E" => strtoupper(utf8_encode($array['nome_c'])),
+                                  "F" => $data,
+                                  "G" => $array['numero_susep'],
+								  "H" => strtoupper(utf8_encode($array['corretor'])),
+								  "I" => utf8_encode($array['modelo']),
+								  "J" => strtoupper($array['placa']),
+								  "K" => strtoupper($array['chassi']),
+								  "L" => strtoupper(utf8_encode($array['nome'])),
+								  "M" => strtoupper(utf8_encode($array['cidade'])),
+								  "N" => strtoupper(utf8_encode($result_filial['nome_filial'])),
+								  "O" => strtoupper($array['estado']),
+								  "P" => $data_frustrada,
+								  "Q" => strtoupper($array['hora']),
+								  "R" => strtoupper(utf8_encode(urldecode($array['mensagem'])))
+                               ));
+
+        $cont14++;
+
+	  } //FIM (IF) LIBERTY
+	  
+	   else{
+
+		$vetor11[] = Array($cont11 => Array(
+                                  "A" => $cont11+1,
+                                  "B" => $array['id'], 
+								  "C" => $array['cliente'],
+								  "D" => utf8_encode($foto),
+                                  "E" => strtoupper(utf8_encode($array['nome_c'])),
+                                  "F" => $data,
+                                  "G" => $array['numero_susep'],
+								  "H" => strtoupper(utf8_encode($array['corretor'])),
+								  "I" => utf8_encode($array['modelo']),
+								  "J" => strtoupper($array['placa']),
+								  "K" => strtoupper($array['chassi']),
+								  "L" => strtoupper(utf8_encode($array['nome'])),
+								  "M" => strtoupper(utf8_encode($array['cidade'])),
+								  "N" => strtoupper(utf8_encode($result_filial['nome_filial'])),
+								  "O" => strtoupper($array['estado']),
+								  "P" => $data_frustrada,
+								  "Q" => strtoupper($array['hora']),
+								  "R" => strtoupper(utf8_encode(urldecode($array['mensagem'])))
+                               ));
+
+        $cont11++;
+
+	  } //FIM (ELSE)
+
+$cont50++;
+
+	}
+	
+  $objPHPExcel->setActiveSheetIndex(0)->insertNewRowBefore($base , $cont0-1);
+  $objPHPExcel->setActiveSheetIndex(1)->insertNewRowBefore($base , $cont1-1);
+  $objPHPExcel->setActiveSheetIndex(2)->insertNewRowBefore($base , $cont2-1);
+  $objPHPExcel->setActiveSheetIndex(3)->insertNewRowBefore($base , $cont3-1);
+  $objPHPExcel->setActiveSheetIndex(4)->insertNewRowBefore($base , $cont4-1);
+  $objPHPExcel->setActiveSheetIndex(5)->insertNewRowBefore($base , $cont5-1);
+  $objPHPExcel->setActiveSheetIndex(6)->insertNewRowBefore($base , $cont6-1);
+  $objPHPExcel->setActiveSheetIndex(7)->insertNewRowBefore($base , $cont7-1);
+  $objPHPExcel->setActiveSheetIndex(8)->insertNewRowBefore($base , $cont8-1);
+  $objPHPExcel->setActiveSheetIndex(9)->insertNewRowBefore($base , $cont9-1);
+  $objPHPExcel->setActiveSheetIndex(10)->insertNewRowBefore($base , $cont10-1);
+  $objPHPExcel->setActiveSheetIndex(11)->insertNewRowBefore($base , $cont11-1);
+  $objPHPExcel->setActiveSheetIndex(12)->insertNewRowBefore($base , $cont11-1);
+  $objPHPExcel->setActiveSheetIndex(13)->insertNewRowBefore($base , $cont11-1);
+  $objPHPExcel->setActiveSheetIndex(14)->insertNewRowBefore($base , $cont11-1);
+  
+foreach ($vetor0 as $key => $value){
+
+if(substr($value[$key]['B'],0,2)=='#_'){	
+$objPHPExcel->setActiveSheetIndex(0)->getStyle( 'A'.($base + $key).':R'.($base + $key) )->applyFromArray(array('font' => array('bold' => true)));
+}
+	  
+$objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'. ($base + $key), $value[$key]['A']);
+$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'. ($base + $key), $value[$key]['B']);
+$objPHPExcel->setActiveSheetIndex(0)->setCellValue('C'. ($base + $key), $value[$key]['C']);
+$objPHPExcel->setActiveSheetIndex(0)->setCellValue('D'. ($base + $key), $value[$key]['D']);
+$objPHPExcel->setActiveSheetIndex(0)->setCellValue('E'. ($base + $key), $value[$key]['E']);
+$objPHPExcel->setActiveSheetIndex(0)->setCellValue('F'. ($base + $key), $value[$key]['F']);
+$objPHPExcel->setActiveSheetIndex(0)->setCellValue('G'. ($base + $key), $value[$key]['G']);
+$objPHPExcel->setActiveSheetIndex(0)->setCellValue('H'. ($base + $key), $value[$key]['H']);
+$objPHPExcel->setActiveSheetIndex(0)->setCellValue('I'. ($base + $key), $value[$key]['I']);
+$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J'. ($base + $key), $value[$key]['J']);
+$objPHPExcel->setActiveSheetIndex(0)->setCellValue('K'. ($base + $key), $value[$key]['K']);
+$objPHPExcel->setActiveSheetIndex(0)->setCellValue('L'. ($base + $key), $value[$key]['L']);
+$objPHPExcel->setActiveSheetIndex(0)->setCellValue('M'. ($base + $key), $value[$key]['M']);
+$objPHPExcel->setActiveSheetIndex(0)->setCellValue('N'. ($base + $key), $value[$key]['N']);
+$objPHPExcel->setActiveSheetIndex(0)->setCellValue('O'. ($base + $key), $value[$key]['O']);
+$objPHPExcel->setActiveSheetIndex(0)->setCellValue('P'. ($base + $key), $value[$key]['P']);
+$objPHPExcel->setActiveSheetIndex(0)->setCellValue('Q'. ($base + $key), $value[$key]['Q']);
+$objPHPExcel->setActiveSheetIndex(0)->setCellValue('R'. ($base + $key), $value[$key]['R']);
+		  }
+
+foreach ($vetor1 as $key => $value){ 
+
+if(substr($value[$key]['B'],0,2)=='#_'){	
+$objPHPExcel->setActiveSheetIndex(1)->getStyle( 'A'.($base + $key).':R'.($base + $key) )->applyFromArray(array('font' => array('bold' => true,'italic' => true)));
+}
+$objPHPExcel->setActiveSheetIndex(1)->setCellValue('A'. ($base + $key), $value[$key]['A']);
+$objPHPExcel->setActiveSheetIndex(1)->setCellValue('B'. ($base + $key), $value[$key]['B']);
+$objPHPExcel->setActiveSheetIndex(1)->setCellValue('C'. ($base + $key), $value[$key]['C']);
+$objPHPExcel->setActiveSheetIndex(1)->setCellValue('D'. ($base + $key), $value[$key]['D']);
+$objPHPExcel->setActiveSheetIndex(1)->setCellValue('E'. ($base + $key), $value[$key]['E']);
+$objPHPExcel->setActiveSheetIndex(1)->setCellValue('F'. ($base + $key), $value[$key]['F']);
+$objPHPExcel->setActiveSheetIndex(1)->setCellValue('G'. ($base + $key), $value[$key]['G']);
+$objPHPExcel->setActiveSheetIndex(1)->setCellValue('H'. ($base + $key), $value[$key]['H']);
+$objPHPExcel->setActiveSheetIndex(1)->setCellValue('I'. ($base + $key), $value[$key]['I']);
+$objPHPExcel->setActiveSheetIndex(1)->setCellValue('J'. ($base + $key), $value[$key]['J']);
+$objPHPExcel->setActiveSheetIndex(1)->setCellValue('K'. ($base + $key), $value[$key]['K']);
+$objPHPExcel->setActiveSheetIndex(1)->setCellValue('L'. ($base + $key), $value[$key]['L']);
+$objPHPExcel->setActiveSheetIndex(1)->setCellValue('M'. ($base + $key), $value[$key]['M']);
+$objPHPExcel->setActiveSheetIndex(1)->setCellValue('N'. ($base + $key), $value[$key]['N']);
+$objPHPExcel->setActiveSheetIndex(1)->setCellValue('O'. ($base + $key), $value[$key]['O']);
+$objPHPExcel->setActiveSheetIndex(1)->setCellValue('P'. ($base + $key), $value[$key]['P']);
+$objPHPExcel->setActiveSheetIndex(1)->setCellValue('Q'. ($base + $key), $value[$key]['Q']);
+$objPHPExcel->setActiveSheetIndex(1)->setCellValue('R'. ($base + $key), $value[$key]['R']);
+		  }
+
+foreach ($vetor2 as $key => $value){ 
+
+if(substr($value[$key]['B'],0,2)=='#_'){	
+$objPHPExcel->setActiveSheetIndex(2)->getStyle( 'A'.($base + $key).':R'.($base + $key) )->applyFromArray(array('font' => array('bold' => true)));
+}
+$objPHPExcel->setActiveSheetIndex(2)->setCellValue('A'. ($base + $key), $value[$key]['A']);
+$objPHPExcel->setActiveSheetIndex(2)->setCellValue('B'. ($base + $key), $value[$key]['B']);
+$objPHPExcel->setActiveSheetIndex(2)->setCellValue('C'. ($base + $key), $value[$key]['C']);
+$objPHPExcel->setActiveSheetIndex(2)->setCellValue('D'. ($base + $key), $value[$key]['D']);
+$objPHPExcel->setActiveSheetIndex(2)->setCellValue('E'. ($base + $key), $value[$key]['E']);
+$objPHPExcel->setActiveSheetIndex(2)->setCellValue('F'. ($base + $key), $value[$key]['F']);
+$objPHPExcel->setActiveSheetIndex(2)->setCellValue('G'. ($base + $key), $value[$key]['G']);
+$objPHPExcel->setActiveSheetIndex(2)->setCellValue('H'. ($base + $key), $value[$key]['H']);
+$objPHPExcel->setActiveSheetIndex(2)->setCellValue('I'. ($base + $key), $value[$key]['I']);
+$objPHPExcel->setActiveSheetIndex(2)->setCellValue('J'. ($base + $key), $value[$key]['J']);
+$objPHPExcel->setActiveSheetIndex(2)->setCellValue('K'. ($base + $key), $value[$key]['K']);
+$objPHPExcel->setActiveSheetIndex(2)->setCellValue('L'. ($base + $key), $value[$key]['L']);
+$objPHPExcel->setActiveSheetIndex(2)->setCellValue('M'. ($base + $key), $value[$key]['M']);
+$objPHPExcel->setActiveSheetIndex(2)->setCellValue('N'. ($base + $key), $value[$key]['N']);
+$objPHPExcel->setActiveSheetIndex(2)->setCellValue('O'. ($base + $key), $value[$key]['O']);
+$objPHPExcel->setActiveSheetIndex(2)->setCellValue('P'. ($base + $key), $value[$key]['P']);
+$objPHPExcel->setActiveSheetIndex(2)->setCellValue('Q'. ($base + $key), $value[$key]['Q']);
+$objPHPExcel->setActiveSheetIndex(2)->setCellValue('R'. ($base + $key), $value[$key]['R']);
+		  }
+
+foreach ($vetor3 as $key => $value){ 
+
+if(substr($value[$key]['B'],0,2)=='#_'){	
+$objPHPExcel->setActiveSheetIndex(3)->getStyle( 'A'.($base + $key).':R'.($base + $key) )->applyFromArray(array('font' => array('bold' => true)));
+}
+$objPHPExcel->setActiveSheetIndex(3)->setCellValue('A'. ($base + $key), $value[$key]['A']);
+$objPHPExcel->setActiveSheetIndex(3)->setCellValue('B'. ($base + $key), $value[$key]['B']);
+$objPHPExcel->setActiveSheetIndex(3)->setCellValue('C'. ($base + $key), $value[$key]['C']);
+$objPHPExcel->setActiveSheetIndex(3)->setCellValue('D'. ($base + $key), $value[$key]['D']);
+$objPHPExcel->setActiveSheetIndex(3)->setCellValue('E'. ($base + $key), $value[$key]['E']);
+$objPHPExcel->setActiveSheetIndex(3)->setCellValue('F'. ($base + $key), $value[$key]['F']);
+$objPHPExcel->setActiveSheetIndex(3)->setCellValue('G'. ($base + $key), $value[$key]['G']);
+$objPHPExcel->setActiveSheetIndex(3)->setCellValue('H'. ($base + $key), $value[$key]['H']);
+$objPHPExcel->setActiveSheetIndex(3)->setCellValue('I'. ($base + $key), $value[$key]['I']);
+$objPHPExcel->setActiveSheetIndex(3)->setCellValue('J'. ($base + $key), $value[$key]['J']);
+$objPHPExcel->setActiveSheetIndex(3)->setCellValue('K'. ($base + $key), $value[$key]['K']);
+$objPHPExcel->setActiveSheetIndex(3)->setCellValue('L'. ($base + $key), $value[$key]['L']);
+$objPHPExcel->setActiveSheetIndex(3)->setCellValue('M'. ($base + $key), $value[$key]['M']);
+$objPHPExcel->setActiveSheetIndex(3)->setCellValue('N'. ($base + $key), $value[$key]['N']);
+$objPHPExcel->setActiveSheetIndex(3)->setCellValue('O'. ($base + $key), $value[$key]['O']);
+$objPHPExcel->setActiveSheetIndex(3)->setCellValue('P'. ($base + $key), $value[$key]['P']);
+$objPHPExcel->setActiveSheetIndex(3)->setCellValue('Q'. ($base + $key), $value[$key]['Q']);
+$objPHPExcel->setActiveSheetIndex(3)->setCellValue('R'. ($base + $key), $value[$key]['R']);
+		  }
+		  
+foreach ($vetor4 as $key => $value){ 
+
+if(substr($value[$key]['B'],0,2)=='#_'){	
+$objPHPExcel->setActiveSheetIndex(4)->getStyle( 'A'.($base + $key).':R'.($base + $key) )->applyFromArray(array('font' => array('bold' => true)));
+}
+$objPHPExcel->setActiveSheetIndex(4)->setCellValue('A'. ($base + $key), $value[$key]['A']);
+$objPHPExcel->setActiveSheetIndex(4)->setCellValue('B'. ($base + $key), $value[$key]['B']);
+$objPHPExcel->setActiveSheetIndex(4)->setCellValue('C'. ($base + $key), $value[$key]['C']);
+$objPHPExcel->setActiveSheetIndex(4)->setCellValue('D'. ($base + $key), $value[$key]['D']);
+$objPHPExcel->setActiveSheetIndex(4)->setCellValue('E'. ($base + $key), $value[$key]['E']);
+$objPHPExcel->setActiveSheetIndex(4)->setCellValue('F'. ($base + $key), $value[$key]['F']);
+$objPHPExcel->setActiveSheetIndex(4)->setCellValue('G'. ($base + $key), $value[$key]['G']);
+$objPHPExcel->setActiveSheetIndex(4)->setCellValue('H'. ($base + $key), $value[$key]['H']);
+$objPHPExcel->setActiveSheetIndex(4)->setCellValue('I'. ($base + $key), $value[$key]['I']);
+$objPHPExcel->setActiveSheetIndex(4)->setCellValue('J'. ($base + $key), $value[$key]['J']);
+$objPHPExcel->setActiveSheetIndex(4)->setCellValue('K'. ($base + $key), $value[$key]['K']);
+$objPHPExcel->setActiveSheetIndex(4)->setCellValue('L'. ($base + $key), $value[$key]['L']);
+$objPHPExcel->setActiveSheetIndex(4)->setCellValue('M'. ($base + $key), $value[$key]['M']);
+$objPHPExcel->setActiveSheetIndex(4)->setCellValue('N'. ($base + $key), $value[$key]['N']);
+$objPHPExcel->setActiveSheetIndex(4)->setCellValue('O'. ($base + $key), $value[$key]['O']);
+$objPHPExcel->setActiveSheetIndex(4)->setCellValue('P'. ($base + $key), $value[$key]['P']);
+$objPHPExcel->setActiveSheetIndex(4)->setCellValue('Q'. ($base + $key), $value[$key]['Q']);
+$objPHPExcel->setActiveSheetIndex(4)->setCellValue('R'. ($base + $key), $value[$key]['R']);
+		  }
+		  
+foreach ($vetor5 as $key => $value){ 
+
+if(substr($value[$key]['B'],0,2)=='#_'){	
+$objPHPExcel->setActiveSheetIndex(5)->getStyle( 'A'.($base + $key).':R'.($base + $key) )->applyFromArray(array('font' => array('bold' => true)));
+}
+$objPHPExcel->setActiveSheetIndex(5)->setCellValue('A'. ($base + $key), $value[$key]['A']);
+$objPHPExcel->setActiveSheetIndex(5)->setCellValue('B'. ($base + $key), $value[$key]['B']);
+$objPHPExcel->setActiveSheetIndex(5)->setCellValue('C'. ($base + $key), $value[$key]['C']);
+$objPHPExcel->setActiveSheetIndex(5)->setCellValue('D'. ($base + $key), $value[$key]['D']);
+$objPHPExcel->setActiveSheetIndex(5)->setCellValue('E'. ($base + $key), $value[$key]['E']);
+$objPHPExcel->setActiveSheetIndex(5)->setCellValue('F'. ($base + $key), $value[$key]['F']);
+$objPHPExcel->setActiveSheetIndex(5)->setCellValue('G'. ($base + $key), $value[$key]['G']);
+$objPHPExcel->setActiveSheetIndex(5)->setCellValue('H'. ($base + $key), $value[$key]['H']);
+$objPHPExcel->setActiveSheetIndex(5)->setCellValue('I'. ($base + $key), $value[$key]['I']);
+$objPHPExcel->setActiveSheetIndex(5)->setCellValue('J'. ($base + $key), $value[$key]['J']);
+$objPHPExcel->setActiveSheetIndex(5)->setCellValue('K'. ($base + $key), $value[$key]['K']);
+$objPHPExcel->setActiveSheetIndex(5)->setCellValue('L'. ($base + $key), $value[$key]['L']);
+$objPHPExcel->setActiveSheetIndex(5)->setCellValue('M'. ($base + $key), $value[$key]['M']);
+$objPHPExcel->setActiveSheetIndex(5)->setCellValue('N'. ($base + $key), $value[$key]['N']);
+$objPHPExcel->setActiveSheetIndex(5)->setCellValue('O'. ($base + $key), $value[$key]['O']);
+$objPHPExcel->setActiveSheetIndex(5)->setCellValue('P'. ($base + $key), $value[$key]['P']);
+$objPHPExcel->setActiveSheetIndex(5)->setCellValue('Q'. ($base + $key), $value[$key]['Q']);
+$objPHPExcel->setActiveSheetIndex(5)->setCellValue('R'. ($base + $key), $value[$key]['R']);
+		  }
+		  
+foreach ($vetor6 as $key => $value){ 
+
+if(substr($value[$key]['B'],0,2)=='#_'){	
+$objPHPExcel->setActiveSheetIndex(6)->getStyle( 'A'.($base + $key).':R'.($base + $key) )->applyFromArray(array('font' => array('bold' => true)));
+}
+$objPHPExcel->setActiveSheetIndex(6)->setCellValue('A'. ($base + $key), $value[$key]['A']);
+$objPHPExcel->setActiveSheetIndex(6)->setCellValue('B'. ($base + $key), $value[$key]['B']);
+$objPHPExcel->setActiveSheetIndex(6)->setCellValue('C'. ($base + $key), $value[$key]['C']);
+$objPHPExcel->setActiveSheetIndex(6)->setCellValue('D'. ($base + $key), $value[$key]['D']);
+$objPHPExcel->setActiveSheetIndex(6)->setCellValue('E'. ($base + $key), $value[$key]['E']);
+$objPHPExcel->setActiveSheetIndex(6)->setCellValue('F'. ($base + $key), $value[$key]['F']);
+$objPHPExcel->setActiveSheetIndex(6)->setCellValue('G'. ($base + $key), $value[$key]['G']);
+$objPHPExcel->setActiveSheetIndex(6)->setCellValue('H'. ($base + $key), $value[$key]['H']);
+$objPHPExcel->setActiveSheetIndex(6)->setCellValue('I'. ($base + $key), $value[$key]['I']);
+$objPHPExcel->setActiveSheetIndex(6)->setCellValue('J'. ($base + $key), $value[$key]['J']);
+$objPHPExcel->setActiveSheetIndex(6)->setCellValue('K'. ($base + $key), $value[$key]['K']);
+$objPHPExcel->setActiveSheetIndex(6)->setCellValue('L'. ($base + $key), $value[$key]['L']);
+$objPHPExcel->setActiveSheetIndex(6)->setCellValue('M'. ($base + $key), $value[$key]['M']);
+$objPHPExcel->setActiveSheetIndex(6)->setCellValue('N'. ($base + $key), $value[$key]['N']);
+$objPHPExcel->setActiveSheetIndex(6)->setCellValue('O'. ($base + $key), $value[$key]['O']);
+$objPHPExcel->setActiveSheetIndex(6)->setCellValue('P'. ($base + $key), $value[$key]['P']);
+$objPHPExcel->setActiveSheetIndex(6)->setCellValue('Q'. ($base + $key), $value[$key]['Q']);
+$objPHPExcel->setActiveSheetIndex(6)->setCellValue('R'. ($base + $key), $value[$key]['R']);
+		  }
+		  
+foreach ($vetor7 as $key => $value){ 
+
+if(substr($value[$key]['B'],0,2)=='#_'){	
+$objPHPExcel->setActiveSheetIndex(7)->getStyle( 'A'.($base + $key).':R'.($base + $key) )->applyFromArray(array('font' => array('bold' => true)));
+}
+$objPHPExcel->setActiveSheetIndex(7)->setCellValue('A'. ($base + $key), $value[$key]['A']);
+$objPHPExcel->setActiveSheetIndex(7)->setCellValue('B'. ($base + $key), $value[$key]['B']);
+$objPHPExcel->setActiveSheetIndex(7)->setCellValue('C'. ($base + $key), $value[$key]['C']);
+$objPHPExcel->setActiveSheetIndex(7)->setCellValue('D'. ($base + $key), $value[$key]['D']);
+$objPHPExcel->setActiveSheetIndex(7)->setCellValue('E'. ($base + $key), $value[$key]['E']);
+$objPHPExcel->setActiveSheetIndex(7)->setCellValue('F'. ($base + $key), $value[$key]['F']);
+$objPHPExcel->setActiveSheetIndex(7)->setCellValue('G'. ($base + $key), $value[$key]['G']);
+$objPHPExcel->setActiveSheetIndex(7)->setCellValue('H'. ($base + $key), $value[$key]['H']);
+$objPHPExcel->setActiveSheetIndex(7)->setCellValue('I'. ($base + $key), $value[$key]['I']);
+$objPHPExcel->setActiveSheetIndex(7)->setCellValue('J'. ($base + $key), $value[$key]['J']);
+$objPHPExcel->setActiveSheetIndex(7)->setCellValue('K'. ($base + $key), $value[$key]['K']);
+$objPHPExcel->setActiveSheetIndex(7)->setCellValue('L'. ($base + $key), $value[$key]['L']);
+$objPHPExcel->setActiveSheetIndex(7)->setCellValue('M'. ($base + $key), $value[$key]['M']);
+$objPHPExcel->setActiveSheetIndex(7)->setCellValue('N'. ($base + $key), $value[$key]['N']);
+$objPHPExcel->setActiveSheetIndex(7)->setCellValue('O'. ($base + $key), $value[$key]['O']);
+$objPHPExcel->setActiveSheetIndex(7)->setCellValue('P'. ($base + $key), $value[$key]['P']);
+$objPHPExcel->setActiveSheetIndex(7)->setCellValue('Q'. ($base + $key), $value[$key]['Q']);
+$objPHPExcel->setActiveSheetIndex(7)->setCellValue('R'. ($base + $key), $value[$key]['R']);
+		  }
+		  
+foreach ($vetor8 as $key => $value){ 
+
+if(substr($value[$key]['B'],0,2)=='#_'){	
+$objPHPExcel->setActiveSheetIndex(8)->getStyle( 'A'.($base + $key).':R'.($base + $key) )->applyFromArray(array('font' => array('bold' => true)));
+}
+$objPHPExcel->setActiveSheetIndex(8)->setCellValue('A'. ($base + $key), $value[$key]['A']);
+$objPHPExcel->setActiveSheetIndex(8)->setCellValue('B'. ($base + $key), $value[$key]['B']);
+$objPHPExcel->setActiveSheetIndex(8)->setCellValue('C'. ($base + $key), $value[$key]['C']);
+$objPHPExcel->setActiveSheetIndex(8)->setCellValue('D'. ($base + $key), $value[$key]['D']);
+$objPHPExcel->setActiveSheetIndex(8)->setCellValue('E'. ($base + $key), $value[$key]['E']);
+$objPHPExcel->setActiveSheetIndex(8)->setCellValue('F'. ($base + $key), $value[$key]['F']);
+$objPHPExcel->setActiveSheetIndex(8)->setCellValue('G'. ($base + $key), $value[$key]['G']);
+$objPHPExcel->setActiveSheetIndex(8)->setCellValue('H'. ($base + $key), $value[$key]['H']);
+$objPHPExcel->setActiveSheetIndex(8)->setCellValue('I'. ($base + $key), $value[$key]['I']);
+$objPHPExcel->setActiveSheetIndex(8)->setCellValue('J'. ($base + $key), $value[$key]['J']);
+$objPHPExcel->setActiveSheetIndex(8)->setCellValue('K'. ($base + $key), $value[$key]['K']);
+$objPHPExcel->setActiveSheetIndex(8)->setCellValue('L'. ($base + $key), $value[$key]['L']);
+$objPHPExcel->setActiveSheetIndex(8)->setCellValue('M'. ($base + $key), $value[$key]['M']);
+$objPHPExcel->setActiveSheetIndex(8)->setCellValue('N'. ($base + $key), $value[$key]['N']);
+$objPHPExcel->setActiveSheetIndex(8)->setCellValue('O'. ($base + $key), $value[$key]['O']);
+$objPHPExcel->setActiveSheetIndex(8)->setCellValue('P'. ($base + $key), $value[$key]['P']);
+$objPHPExcel->setActiveSheetIndex(8)->setCellValue('Q'. ($base + $key), $value[$key]['Q']);
+$objPHPExcel->setActiveSheetIndex(8)->setCellValue('R'. ($base + $key), $value[$key]['R']);
+		  }
+		  
+foreach ($vetor9 as $key => $value){ 
+
+if(substr($value[$key]['B'],0,2)=='#_'){	
+$objPHPExcel->setActiveSheetIndex(9)->getStyle( 'A'.($base + $key).':R'.($base + $key) )->applyFromArray(array('font' => array('bold' => true)));
+}
+$objPHPExcel->setActiveSheetIndex(9)->setCellValue('A'. ($base + $key), $value[$key]['A']);
+$objPHPExcel->setActiveSheetIndex(9)->setCellValue('B'. ($base + $key), $value[$key]['B']);
+$objPHPExcel->setActiveSheetIndex(9)->setCellValue('C'. ($base + $key), $value[$key]['C']);
+$objPHPExcel->setActiveSheetIndex(9)->setCellValue('D'. ($base + $key), $value[$key]['D']);
+$objPHPExcel->setActiveSheetIndex(9)->setCellValue('E'. ($base + $key), $value[$key]['E']);
+$objPHPExcel->setActiveSheetIndex(9)->setCellValue('F'. ($base + $key), $value[$key]['F']);
+$objPHPExcel->setActiveSheetIndex(9)->setCellValue('G'. ($base + $key), $value[$key]['G']);
+$objPHPExcel->setActiveSheetIndex(9)->setCellValue('H'. ($base + $key), $value[$key]['H']);
+$objPHPExcel->setActiveSheetIndex(9)->setCellValue('I'. ($base + $key), $value[$key]['I']);
+$objPHPExcel->setActiveSheetIndex(9)->setCellValue('J'. ($base + $key), $value[$key]['J']);
+$objPHPExcel->setActiveSheetIndex(9)->setCellValue('K'. ($base + $key), $value[$key]['K']);
+$objPHPExcel->setActiveSheetIndex(9)->setCellValue('L'. ($base + $key), $value[$key]['L']);
+$objPHPExcel->setActiveSheetIndex(9)->setCellValue('M'. ($base + $key), $value[$key]['M']);
+$objPHPExcel->setActiveSheetIndex(9)->setCellValue('N'. ($base + $key), $value[$key]['N']);
+$objPHPExcel->setActiveSheetIndex(9)->setCellValue('O'. ($base + $key), $value[$key]['O']);
+$objPHPExcel->setActiveSheetIndex(9)->setCellValue('P'. ($base + $key), $value[$key]['P']);
+$objPHPExcel->setActiveSheetIndex(9)->setCellValue('Q'. ($base + $key), $value[$key]['Q']);
+$objPHPExcel->setActiveSheetIndex(9)->setCellValue('R'. ($base + $key), $value[$key]['R']);
+		  }
+		  
+foreach ($vetor10 as $key => $value){ 
+
+if(substr($value[$key]['B'],0,2)=='#_'){	
+$objPHPExcel->setActiveSheetIndex(10)->getStyle( 'A'.($base + $key).':R'.($base + $key) )->applyFromArray(array('font' => array('bold' => true)));
+}
+$objPHPExcel->setActiveSheetIndex(10)->setCellValue('A'. ($base + $key), $value[$key]['A']);
+$objPHPExcel->setActiveSheetIndex(10)->setCellValue('B'. ($base + $key), $value[$key]['B']);
+$objPHPExcel->setActiveSheetIndex(10)->setCellValue('C'. ($base + $key), $value[$key]['C']);
+$objPHPExcel->setActiveSheetIndex(10)->setCellValue('D'. ($base + $key), $value[$key]['D']);
+$objPHPExcel->setActiveSheetIndex(10)->setCellValue('E'. ($base + $key), $value[$key]['E']);
+$objPHPExcel->setActiveSheetIndex(10)->setCellValue('F'. ($base + $key), $value[$key]['F']);
+$objPHPExcel->setActiveSheetIndex(10)->setCellValue('G'. ($base + $key), $value[$key]['G']);
+$objPHPExcel->setActiveSheetIndex(10)->setCellValue('H'. ($base + $key), $value[$key]['H']);
+$objPHPExcel->setActiveSheetIndex(10)->setCellValue('I'. ($base + $key), $value[$key]['I']);
+$objPHPExcel->setActiveSheetIndex(10)->setCellValue('J'. ($base + $key), $value[$key]['J']);
+$objPHPExcel->setActiveSheetIndex(10)->setCellValue('K'. ($base + $key), $value[$key]['K']);
+$objPHPExcel->setActiveSheetIndex(10)->setCellValue('L'. ($base + $key), $value[$key]['L']);
+$objPHPExcel->setActiveSheetIndex(10)->setCellValue('M'. ($base + $key), $value[$key]['M']);
+$objPHPExcel->setActiveSheetIndex(10)->setCellValue('N'. ($base + $key), $value[$key]['N']);
+$objPHPExcel->setActiveSheetIndex(10)->setCellValue('O'. ($base + $key), $value[$key]['O']);
+$objPHPExcel->setActiveSheetIndex(10)->setCellValue('P'. ($base + $key), $value[$key]['P']);
+$objPHPExcel->setActiveSheetIndex(10)->setCellValue('Q'. ($base + $key), $value[$key]['Q']);
+$objPHPExcel->setActiveSheetIndex(10)->setCellValue('R'. ($base + $key), $value[$key]['R']);
+		  }
+		  
+foreach ($vetor11 as $key => $value){
+	
+if(substr($value[$key]['B'],0,2)=='#_'){	
+$objPHPExcel->setActiveSheetIndex(11)->getStyle( 'A'.($base + $key).':R'.($base + $key) )->applyFromArray(array('font' => array('bold' => true)));
+} 
+$objPHPExcel->setActiveSheetIndex(11)->setCellValue('A'. ($base + $key), $value[$key]['A']);
+$objPHPExcel->setActiveSheetIndex(11)->setCellValue('B'. ($base + $key), $value[$key]['B']);
+$objPHPExcel->setActiveSheetIndex(11)->setCellValue('C'. ($base + $key), $value[$key]['C']);
+$objPHPExcel->setActiveSheetIndex(11)->setCellValue('D'. ($base + $key), $value[$key]['D']);
+$objPHPExcel->setActiveSheetIndex(11)->setCellValue('E'. ($base + $key), $value[$key]['E']);
+$objPHPExcel->setActiveSheetIndex(11)->setCellValue('F'. ($base + $key), $value[$key]['F']);
+$objPHPExcel->setActiveSheetIndex(11)->setCellValue('G'. ($base + $key), $value[$key]['G']);
+$objPHPExcel->setActiveSheetIndex(11)->setCellValue('H'. ($base + $key), $value[$key]['H']);
+$objPHPExcel->setActiveSheetIndex(11)->setCellValue('I'. ($base + $key), $value[$key]['I']);
+$objPHPExcel->setActiveSheetIndex(11)->setCellValue('J'. ($base + $key), $value[$key]['J']);
+$objPHPExcel->setActiveSheetIndex(11)->setCellValue('K'. ($base + $key), $value[$key]['K']);
+$objPHPExcel->setActiveSheetIndex(11)->setCellValue('L'. ($base + $key), $value[$key]['L']);
+$objPHPExcel->setActiveSheetIndex(11)->setCellValue('M'. ($base + $key), $value[$key]['M']);
+$objPHPExcel->setActiveSheetIndex(11)->setCellValue('N'. ($base + $key), $value[$key]['N']);
+$objPHPExcel->setActiveSheetIndex(11)->setCellValue('O'. ($base + $key), $value[$key]['O']);
+$objPHPExcel->setActiveSheetIndex(11)->setCellValue('P'. ($base + $key), $value[$key]['P']);
+$objPHPExcel->setActiveSheetIndex(11)->setCellValue('Q'. ($base + $key), $value[$key]['Q']);
+$objPHPExcel->setActiveSheetIndex(11)->setCellValue('R'. ($base + $key), $value[$key]['R']);
+		  }
+		  
+foreach ($vetor12 as $key => $value){ 
+
+if(substr($value[$key]['B'],0,2)=='#_'){	
+$objPHPExcel->setActiveSheetIndex(12)->getStyle( 'A'.($base + $key).':R'.($base + $key) )->applyFromArray(array('font' => array('bold' => true)));
+}
+$objPHPExcel->setActiveSheetIndex(12)->setCellValue('A'. ($base + $key), $value[$key]['A']);
+$objPHPExcel->setActiveSheetIndex(12)->setCellValue('B'. ($base + $key), $value[$key]['B']);
+$objPHPExcel->setActiveSheetIndex(12)->setCellValue('C'. ($base + $key), $value[$key]['C']);
+$objPHPExcel->setActiveSheetIndex(12)->setCellValue('D'. ($base + $key), $value[$key]['D']);
+$objPHPExcel->setActiveSheetIndex(12)->setCellValue('E'. ($base + $key), $value[$key]['E']);
+$objPHPExcel->setActiveSheetIndex(12)->setCellValue('F'. ($base + $key), $value[$key]['F']);
+$objPHPExcel->setActiveSheetIndex(12)->setCellValue('G'. ($base + $key), $value[$key]['G']);
+$objPHPExcel->setActiveSheetIndex(12)->setCellValue('H'. ($base + $key), $value[$key]['H']);
+$objPHPExcel->setActiveSheetIndex(12)->setCellValue('I'. ($base + $key), $value[$key]['I']);
+$objPHPExcel->setActiveSheetIndex(12)->setCellValue('J'. ($base + $key), $value[$key]['J']);
+$objPHPExcel->setActiveSheetIndex(12)->setCellValue('K'. ($base + $key), $value[$key]['K']);
+$objPHPExcel->setActiveSheetIndex(12)->setCellValue('L'. ($base + $key), $value[$key]['L']);
+$objPHPExcel->setActiveSheetIndex(12)->setCellValue('M'. ($base + $key), $value[$key]['M']);
+$objPHPExcel->setActiveSheetIndex(12)->setCellValue('N'. ($base + $key), $value[$key]['N']);
+$objPHPExcel->setActiveSheetIndex(12)->setCellValue('O'. ($base + $key), $value[$key]['O']);
+$objPHPExcel->setActiveSheetIndex(12)->setCellValue('P'. ($base + $key), $value[$key]['P']);
+$objPHPExcel->setActiveSheetIndex(12)->setCellValue('Q'. ($base + $key), $value[$key]['Q']);
+$objPHPExcel->setActiveSheetIndex(12)->setCellValue('R'. ($base + $key), $value[$key]['R']);
+		  }
+		  
+foreach ($vetor13 as $key => $value){ 
+
+if(substr($value[$key]['B'],0,2)=='#_'){	
+$objPHPExcel->setActiveSheetIndex(13)->getStyle( 'A'.($base + $key).':R'.($base + $key) )->applyFromArray(array('font' => array('bold' => true)));
+}
+$objPHPExcel->setActiveSheetIndex(13)->setCellValue('A'. ($base + $key), $value[$key]['A']);
+$objPHPExcel->setActiveSheetIndex(13)->setCellValue('B'. ($base + $key), $value[$key]['B']);
+$objPHPExcel->setActiveSheetIndex(13)->setCellValue('C'. ($base + $key), $value[$key]['C']);
+$objPHPExcel->setActiveSheetIndex(13)->setCellValue('D'. ($base + $key), $value[$key]['D']);
+$objPHPExcel->setActiveSheetIndex(13)->setCellValue('E'. ($base + $key), $value[$key]['E']);
+$objPHPExcel->setActiveSheetIndex(13)->setCellValue('F'. ($base + $key), $value[$key]['F']);
+$objPHPExcel->setActiveSheetIndex(13)->setCellValue('G'. ($base + $key), $value[$key]['G']);
+$objPHPExcel->setActiveSheetIndex(13)->setCellValue('H'. ($base + $key), $value[$key]['H']);
+$objPHPExcel->setActiveSheetIndex(13)->setCellValue('I'. ($base + $key), $value[$key]['I']);
+$objPHPExcel->setActiveSheetIndex(13)->setCellValue('J'. ($base + $key), $value[$key]['J']);
+$objPHPExcel->setActiveSheetIndex(13)->setCellValue('K'. ($base + $key), $value[$key]['K']);
+$objPHPExcel->setActiveSheetIndex(13)->setCellValue('L'. ($base + $key), $value[$key]['L']);
+$objPHPExcel->setActiveSheetIndex(13)->setCellValue('M'. ($base + $key), $value[$key]['M']);
+$objPHPExcel->setActiveSheetIndex(13)->setCellValue('N'. ($base + $key), $value[$key]['N']);
+$objPHPExcel->setActiveSheetIndex(13)->setCellValue('O'. ($base + $key), $value[$key]['O']);
+$objPHPExcel->setActiveSheetIndex(13)->setCellValue('P'. ($base + $key), $value[$key]['P']);
+$objPHPExcel->setActiveSheetIndex(13)->setCellValue('Q'. ($base + $key), $value[$key]['Q']);
+$objPHPExcel->setActiveSheetIndex(13)->setCellValue('R'. ($base + $key), $value[$key]['R']);
+		  }
+		  
+foreach ($vetor14 as $key => $value){ 
+
+if(substr($value[$key]['B'],0,2)=='#_'){	
+$objPHPExcel->setActiveSheetIndex(14)->getStyle('B'. ($base + $key))->applyFromArray(array('font' => array('bold' => true)));
+}
+$objPHPExcel->setActiveSheetIndex(14)->setCellValue('A'. ($base + $key), $value[$key]['A']);
+$objPHPExcel->setActiveSheetIndex(14)->setCellValue('B'. ($base + $key), $value[$key]['B']);
+$objPHPExcel->setActiveSheetIndex(14)->setCellValue('C'. ($base + $key), $value[$key]['C']);
+$objPHPExcel->setActiveSheetIndex(14)->setCellValue('D'. ($base + $key), $value[$key]['D']);
+$objPHPExcel->setActiveSheetIndex(14)->setCellValue('E'. ($base + $key), $value[$key]['E']);
+$objPHPExcel->setActiveSheetIndex(14)->setCellValue('F'. ($base + $key), $value[$key]['F']);
+$objPHPExcel->setActiveSheetIndex(14)->setCellValue('G'. ($base + $key), $value[$key]['G']);
+$objPHPExcel->setActiveSheetIndex(14)->setCellValue('H'. ($base + $key), $value[$key]['H']);
+$objPHPExcel->setActiveSheetIndex(14)->setCellValue('I'. ($base + $key), $value[$key]['I']);
+$objPHPExcel->setActiveSheetIndex(14)->setCellValue('J'. ($base + $key), $value[$key]['J']);
+$objPHPExcel->setActiveSheetIndex(14)->setCellValue('K'. ($base + $key), $value[$key]['K']);
+$objPHPExcel->setActiveSheetIndex(14)->setCellValue('L'. ($base + $key), $value[$key]['L']);
+$objPHPExcel->setActiveSheetIndex(14)->setCellValue('M'. ($base + $key), $value[$key]['M']);
+$objPHPExcel->setActiveSheetIndex(14)->setCellValue('N'. ($base + $key), $value[$key]['N']);
+$objPHPExcel->setActiveSheetIndex(14)->setCellValue('O'. ($base + $key), $value[$key]['O']);
+$objPHPExcel->setActiveSheetIndex(14)->setCellValue('P'. ($base + $key), $value[$key]['P']);
+$objPHPExcel->setActiveSheetIndex(14)->setCellValue('Q'. ($base + $key), $value[$key]['Q']);
+$objPHPExcel->setActiveSheetIndex(14)->setCellValue('R'. ($base + $key), $value[$key]['R']);
+		  }
+		  
+$objPHPExcel->setActiveSheetIndex(0)->removeRow($base - 1,1);
+$objPHPExcel->setActiveSheetIndex(1)->removeRow($base - 1,1);
+$objPHPExcel->setActiveSheetIndex(2)->removeRow($base - 1,1);
+$objPHPExcel->setActiveSheetIndex(3)->removeRow($base - 1,1);
+$objPHPExcel->setActiveSheetIndex(4)->removeRow($base - 1,1);
+$objPHPExcel->setActiveSheetIndex(5)->removeRow($base - 1,1);
+$objPHPExcel->setActiveSheetIndex(6)->removeRow($base - 1,1);
+$objPHPExcel->setActiveSheetIndex(7)->removeRow($base - 1,1);
+$objPHPExcel->setActiveSheetIndex(8)->removeRow($base - 1,1);
+$objPHPExcel->setActiveSheetIndex(9)->removeRow($base - 1,1);
+$objPHPExcel->setActiveSheetIndex(10)->removeRow($base - 1,1);
+$objPHPExcel->setActiveSheetIndex(11)->removeRow($base - 1,1);
+$objPHPExcel->setActiveSheetIndex(12)->removeRow($base - 1,1);
+$objPHPExcel->setActiveSheetIndex(13)->removeRow($base - 1,1);
+$objPHPExcel->setActiveSheetIndex(14)->removeRow($base - 1,1);
+
+
+switch($_SESSION['roteirizador']){
+	case 0: $empresa='BS2'; $nome_empresa='BS2 Consultoria '; break;
+	case 20: $empresa='ACONFERIR'; $nome_empresa='ACONFERIR'; break;
+	case 60: $empresa='EXCEL'; $nome_empresa='EXCEL'; break;
+	case 70: $empresa='JEF'; $nome_empresa='JEF VISTORIAS'; break;
+	case 75: $empresa='VISION'; $nome_empresa='VISION VISTORIAS'; break;
+	case 80: $empresa='OK'; $nome_empresa='OK VISTORIAS'; break;
+	case 90: $empresa='REALIZA'; $nome_empresa='REALIZA VISTORIAS'; break;
+	case 100: $empresa='VS'; $nome_empresa='VS VISTORIAS'; break;
+	case 110: $empresa='PREVICAR'; $nome_empresa='PREVICAR VISTORIAS'; break;
+	case 140: $empresa='ETH'; $nome_empresa='ETH VISTORIAS'; break;
+	case 150: $empresa='CENTRAL'; $nome_empresa='CENTRAL VISTORIAS'; break;
+	case 160: $empresa='MINASROTA'; $nome_empresa='MINAS ROTA VISTORIAS'; break;
+	case 170: $empresa='BRAGA'; $nome_empresa='BRAGA VISTORIAS'; break;
+	case 627: $empresa='3VIA'; $nome_empresa='3ª Via'; break;
+	case 1786: $empresa='STYLLUS'; $nome_empresa='Styllus Vistorias';break;
+	default: $empresa='AREA-TI'; break;
+	}
+
+
+	$objPHPExcel->setActiveSheetIndex(0)->setCellValue('E5', utf8_encode($nome_empresa));
+	$objPHPExcel->setActiveSheetIndex(1)->setCellValue('E5', utf8_encode($nome_empresa));
+	$objPHPExcel->setActiveSheetIndex(2)->setCellValue('E5', utf8_encode($nome_empresa));
+	$objPHPExcel->setActiveSheetIndex(3)->setCellValue('E5', utf8_encode($nome_empresa));
+	$objPHPExcel->setActiveSheetIndex(4)->setCellValue('E5', utf8_encode($nome_empresa));
+	$objPHPExcel->setActiveSheetIndex(5)->setCellValue('E5', utf8_encode($nome_empresa));
+	$objPHPExcel->setActiveSheetIndex(6)->setCellValue('E5', utf8_encode($nome_empresa));
+	$objPHPExcel->setActiveSheetIndex(7)->setCellValue('E5', utf8_encode($nome_empresa));
+	$objPHPExcel->setActiveSheetIndex(8)->setCellValue('E5', utf8_encode($nome_empresa));
+	$objPHPExcel->setActiveSheetIndex(9)->setCellValue('E5', utf8_encode($nome_empresa));
+	$objPHPExcel->setActiveSheetIndex(10)->setCellValue('E5', utf8_encode($nome_empresa));
+	$objPHPExcel->setActiveSheetIndex(11)->setCellValue('E5', utf8_encode($nome_empresa));
+	$objPHPExcel->setActiveSheetIndex(12)->setCellValue('E5', utf8_encode($nome_empresa));
+	$objPHPExcel->setActiveSheetIndex(13)->setCellValue('E5', utf8_encode($nome_empresa));
+	$objPHPExcel->setActiveSheetIndex(14)->setCellValue('E5', utf8_encode($nome_empresa));
+				
+
+ 
+$periodo1 = strtr($periodo, array("/"=>"-"));
+$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+#$objWriter->save('php://output');
+$objWriter->save("relatoriosTemporarios/RELATORIO_FRUSTRADAS_".$empresa."_".$periodo1.".xlsx");
+
+downloadFile( "relatoriosTemporarios/RELATORIO_FRUSTRADAS_".$empresa."_".$periodo1.".xlsx" );
+
+unlink("relatoriosTemporarios/RELATORIO_FRUSTRADAS_".$empresa."_".$periodo1.".xlsx");
+
+
+################ APAGANDO TABELAS TEMPORÁRIAS CASO EXISTAM ####################
+
+
+
+$sql_apaga2 = "DROP TABLE ".$bancoDados.".solicitacao_temp";	
+$result_apaga2 = mysql_query($sql_apaga2,$db);
+
+$sql_apaga3 = "DROP TABLE ".$bancoDados.".frustada_temp";	
+$result_apaga3 = mysql_query($sql_apaga3,$db);
+
+$sql_apaga4 = "DROP TABLE ".$bancoDados.".fotos_temp";	
+$result_apaga4 = mysql_query($sql_apaga4,$db);
+
+
+
+
+###############################################################################
+
+exit(0);
+?>
