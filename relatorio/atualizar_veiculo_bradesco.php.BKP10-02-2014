@@ -1,0 +1,163 @@
+<?
+include "../../adm/conecta.php";
+include "../verifica.php";
+ini_set("memory_limit","90M");
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script language="JavaScript" type="text/javascript" src="richtext.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Atualizar Ve&iacute;culos Bradesco Seguros</title>
+<style type="text/css">
+<!--
+.style1 {color: #FFFFFF}
+.style12 {	color: #333333;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+}
+.style12 {	color: #333333;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+}
+.style3 {font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+	color: #FF0000;
+	}
+.style2 {font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+	color: #003399;
+}
+</style>
+</head>
+
+<body>
+
+<form action="atualizar_veiculo_bradesco.php" method="post" enctype="multipart/form-data" name="RTEDemo">
+<table width="100%" border="00" cellpadding="0" cellspacing="0">
+  <tr>
+   <td height="25" colspan="2" style="color:#FFF; background:#000; text-align:center; font-weight:bold">&nbsp;&nbsp;Atualizar Ve&iacute;culos Bradesco Seguros</td>
+  </tr>
+  <tr>
+    <td height="27" colspan="2"><span class="style12">&nbsp;&nbsp;</span></td>
+  </tr>
+<TR onMouseOver="this.style.backgroundColor='#0099cc'" onMouseOut="javascript:this.style.backgroundColor=''" >
+    <td width="25%" height="30" class="style12">&nbsp;Insira o txt</td>
+    <td> <div align="left" class="style12">
+      &nbsp;
+      <input type="file" name="Filedata" id="Filedata" />
+    </div></td>
+  </tr>
+  <tr> 
+    <td height="50" colspan="2">
+     <br /><br />
+       <div style="width:50%; float:left; text-align:center">
+   	    	<img src="../imagens/voltar.png" style="cursor:pointer" title="voltar" onclick="window.top.novo('ferramentas','body','checar_body');document.getElementById('atualiza').value='';" />
+		</div>
+   <div style="width:50%; float:left; text-align:center">
+   		<input type="image" src="../imagens/atualizar.png" name="Submit" id="button" title="Atualizar" />
+	</div>
+     </td>
+  </tr>
+</table>
+</form>
+<?
+
+preg_match('/(VISAR026)[^|]{1,}/i', $_FILES['Filedata']["name"], $result);
+preg_match('/\.([0-9A-z]{1,})/i', $_FILES['Filedata']["name"], $result2);
+$nomeArquivo=$result[1];
+$extensao=$result2[1];
+
+
+if($_FILES)
+{
+$arquivo = "atualizacoesTemp/veiculos_".date(Ymd)."".date('H:i').".txt";
+move_uploaded_file($_FILES['Filedata']['tmp_name'], $arquivo);
+$fp = fopen($arquivo,'r');
+
+if( ($nomeArquivo=='VISAR026') && (strtoupper($extensao)=='TXT' || strtoupper($extensao)=='DAT') )
+{
+//lemos o arquivo
+$texto = fread($fp, filesize($arquivo));
+
+//transformamos as quebras de linha em etiquetas <br>
+$texto = nl2br($texto);
+$array = split("\n",$texto);
+//print_r($array);
+?>
+<table width="100%" border="00" cellpadding="0" cellspacing="0">
+ <tr>
+    <td height="25" colspan="4" style="color:#FFF; background:#000; text-align:center; font-weight:bold">&nbsp;&nbsp;Dados da Atualiza&ccedil;&atilde;o</td>
+  </tr>
+ 
+ <? 
+ $contador=1;
+  $cont=0;
+ $contador_novos=0;
+ $final = sizeof($array)-2;
+   while($contador<$final)
+   {
+	   $sql_fipe = "SELECT * FROM veiculos WHERE CODIGO like '".trim(substr($array[$contador],1,4))."'";
+	   $result_fipe = @mysql_query($sql_fipe,$db);
+	   if(@mysql_num_rows($result_fipe)>0)
+	   {
+	      $mensagem="<span class='style2'>Sem altera&ccedil;&atilde;o</span>";
+	   }
+	   else
+	   {
+				$sql1 = "INSERT INTO veiculos (CODIGO,MODELO,FABRICANTE) 
+				VALUES (
+				'".trim(substr($array[$contador],1,4))."',
+				'".trim(substr($array[$contador],5,60))."',
+				'".trim(substr($array[$contador],68,30))."')";
+				$result2 = mysql_query($sql1,$db);
+				if ($result2)
+				{
+				$cont++;
+				$mensagem="<span class='style3'>Adicionado</span>";
+				$contador_novos++;
+				}
+		}
+			
+$contador++;
+}?>
+  <tr>
+    <td height="50" colspan="4"><center><h3>Quantidade de novos ve&iacute;culos &nbsp;<? echo $cont;?>&nbsp;</h3></center></td>
+  </tr>
+  </tr>
+</table>
+<?
+$obs="Quantidade de novos ve&iacute;culos ".$cont;
+unlink($arquivo);
+}else{
+	
+	$arquivo = "atualizacoesTemp/atualizar_veiculo_bradesco - ".$_SESSION['roteirizador'] . " - hora - ".date('H:i')." - " . $_FILES['Filedata']['name'];
+	move_uploaded_file($_FILES['Filedata']['tmp_name'], $arquivo);
+	$ponteiroArquivo = fopen($arquivo, "r");
+	
+	echo "<br /><br /><br /><center><h1>Não foi possível atualizar a tabela pois o arquivo enviado está em formato inválido.<br>Informe o administrador do sistema.<h1></center>";
+	$obs="Não foi possível atualizar a tabela pois o arquivo enviado está em formato inválido.";
+
+	}
+
+##################################################### REGISTRA UPLOAD ##################################################################################
+include "../class.log.php";
+try{
+$registra = new registraLog();
+$registra->upload($_SERVER['REMOTE_ADDR'],"relatorio/","atualizar_veiculo_bradesco.php",$_FILES['Filedata']["name"],$_SESSION['id'],$_SESSION['permissao'],$obs );
+}
+catch(Exception $erro)
+  {
+    echo $erro;
+  }
+######################################################################################################################################################
+	
+}
+
+?>
+</body>
+</html>

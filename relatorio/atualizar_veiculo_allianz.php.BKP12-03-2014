@@ -1,0 +1,349 @@
+<?
+include "../../adm/conecta.php";
+include "../verifica.php";
+ini_set("memory_limit","90M");
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script language="JavaScript" type="text/javascript" src="richtext.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Atualizar Ve&iacute;culos Allianz Seguros</title>
+<style type="text/css">
+<!--
+.style1 {color: #FFFFFF}
+.style12 {	color: #333333;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+}
+.style12 {	color: #333333;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+}
+.style3 {font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+	color: #FF0000;
+	}
+.style2 {font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+	color: #003399;
+}
+</style>
+</head>
+
+<body>
+<form action="atualizar_veiculo_allianz.php" method="post" enctype="multipart/form-data" name="RTEDemo">
+<table width="98%" border="00" cellpadding="0" cellspacing="0">
+  <tr>
+    <td height="50" colspan="2" style="color:#FFF; background:#000; text-align:center; font-weight:bold">&nbsp;&nbsp;Atualizar Ve&iacute;culos Allianz</td>
+  </tr>
+  <tr>
+    <td height="27" colspan="2"><span class="style12">&nbsp;&nbsp;</span></td>
+  </tr>
+<TR onMouseOver="this.style.backgroundColor='#0099cc'" onMouseOut="javascript:this.style.backgroundColor=''" >
+    <td width="25%" height="30" class="style12">&nbsp;&nbsp;Insira o arquivo no formato csv </td>
+    <td> <div align="left" class="style12">
+      &nbsp;
+      <input type="file" name="Filedata" id="Filedata" />
+    </div></td>
+  </tr>
+   <tr> 
+    <td height="50" colspan="2">
+      <br /><br />
+       <div style="width:50%; float:left; text-align:center">
+   	    	<img src="../imagens/voltar.png" style="cursor:pointer" title="voltar" onclick="window.top.novo('ferramentas','body','checar_body');document.getElementById('atualiza').value='';" />
+		</div>
+   <div style="width:50%; float:left; text-align:center">
+   		<input type="image" src="../imagens/atualizar.png" name="Submit" id="button" title="Atualizar" />
+	</div>
+      
+      </td>
+  </tr>
+</table>
+</form>
+<?
+
+preg_match('/(tbvis_modelo)[^|]{1,}/i', $_FILES['Filedata']["name"], $result);
+preg_match('/\.([0-9A-z]{1,})/i', $_FILES['Filedata']["name"], $result2);
+$nomeArquivo=$result[1];
+$extensao=$result2[1];
+
+if($_FILES)
+{
+	
+if( ($nomeArquivo=='tbvis_modelo') && (strtoupper($extensao)=='CSV') )
+{
+	
+$arquivo = "atualizacoesTemp/veiculos_".date('Ymd')."".date('Hi').".csv";
+move_uploaded_file($_FILES['Filedata']['tmp_name'], $arquivo);
+$fp = fopen($arquivo,'r');
+
+
+$sql_fipe = "TRUNCATE TABLE veiculos_allianz";
+$result_fipe = @mysql_query($sql_fipe,$db);
+
+//lemos o arquivo
+$texto = fread($fp, filesize($arquivo));
+
+//transformamos as quebras de linha em etiquetas <br>
+$texto = nl2br($texto);
+$array = split("\n",$texto);
+//print_r($array);
+?>
+<table width="100%" border="00" cellpadding="0" cellspacing="0" bgcolor="#F9F9F9">
+  <tr>
+    <td height="25" colspan="4" style="color:#FFF; background:#000; text-align:center; font-weight:bold">&nbsp;&nbsp;Dados da Atualiza&ccedil;&atilde;o</td>
+  </tr>
+ <? 
+ $contador=1;
+ $cont=0;
+ $contador1=1;
+ for($i=0;next($array);$i++)
+   {
+   	   $array_csv = split(";",$array[$contador]);
+	   if(strlen(trim($array_csv[2]))>=2)
+	   {
+	  /* $sql_fipe = "SELECT * FROM veiculos_allianz  WHERE ds_descricao like '".$array_csv[2]."'";
+	   $result_fipe = @mysql_query($sql_fipe,$db);
+	   if(@mysql_num_rows($result_fipe)>0)
+	   {
+	      $mensagem="<span class='style2'>Sem altera&ccedil;&atilde;o</span>";
+	   }
+	   else
+	   {*/
+	   
+	   switch(trim($array_csv[0]))
+	   {
+case "1": $fabricante="AGRALE";break;
+case "2": $fabricante="ALFA ROMEO";break;
+case "3": $fabricante="ASIA";break;
+case "4": $fabricante="AUDI";break;
+case "6": $fabricante="BMW";break;
+case "7": $fabricante="BRANDY";break;
+case "8": $fabricante="KTM";break;
+case "9": $fabricante="CHRYSLER";break;
+case "10": $fabricante="CITROEN";break;
+case "11": $fabricante="DAEWOO";break;
+case "12": $fabricante="DAIHATSU";break;
+case "13": $fabricante="DODGE";break;
+case "14": $fabricante="FERRARI";break;
+case "15": $fabricante="FIAT";break;
+case "16": $fabricante="FORD";break;
+case "17": $fabricante="CHEVROLET";break;
+case "18": $fabricante="HARLEY-DAV";break;
+case "19": $fabricante="HONDA";break;
+case "20": $fabricante="HYOSUNG";break;
+case "21": $fabricante="HYUNDAI";break;
+case "22": $fabricante="ISUZU";break;
+case "23": $fabricante="JAGUAR";break;
+case "25": $fabricante="KAHENA";break;
+case "26": $fabricante="KAWASAKI";break;
+case "27": $fabricante="KIA";break;
+case "29": $fabricante="LADA";break;
+case "30": $fabricante="LAMBORGHINI";break;
+case "31": $fabricante="LAND ROVER";break;
+case "32": $fabricante="LOTUS";break;
+case "33": $fabricante="MASERATI";break;
+case "34": $fabricante="MAZDA";break;
+case "35": $fabricante="MERCEDES-B";break;
+case "36": $fabricante="MITSUBISHI";break;
+case "37": $fabricante="NISSAN";break;
+case "38": $fabricante="PEUGEOT";break;
+case "39": $fabricante="PORSCHE";break;
+case "40": $fabricante="RENAULT";break;
+case "42": $fabricante="ROVER";break;
+case "43": $fabricante="SAAB";break;
+case "44": $fabricante="SCANIA";break;
+case "45": $fabricante="SEAT";break;
+case "46": $fabricante="SUBARU";break;
+case "47": $fabricante="SUZUKI";break;
+case "48": $fabricante="TOYOTA";break;
+case "49": $fabricante="TRIUMPH";break;
+case "50": $fabricante="PIAGGIO";break;
+case "51": $fabricante="VOLKSWAGEN";break;
+case "52": $fabricante="VOLVO";break;
+case "53": $fabricante="YAMAHA";break;
+case "54": $fabricante="SANYANG";break;
+case "55": $fabricante="SSANGYONG";break;
+case "56": $fabricante="JPX";break;
+case "57": $fabricante="GURGEL";break;
+case "58": $fabricante="CBT";break;
+case "59": $fabricante="ENGESA";break;
+case "60": $fabricante="DAELIM";break;
+case "61": $fabricante="GMC";break;
+case "64": $fabricante="PUMA";break;
+case "66": $fabricante="SUNDOWN";break;
+case "68": $fabricante="CALOI";break;
+case "69": $fabricante="EMME";break;
+case "70": $fabricante="ACURA";break;
+case "71": $fabricante="CAGIVA";break;
+case "72": $fabricante="DUCATI";break;
+case "73": $fabricante="CADILLAC";break;
+case "74": $fabricante="ENVEMO";break;
+case "75": $fabricante="GEO";break;
+case "76": $fabricante="HUSQVARNA";break;
+case "77": $fabricante="IVECO-FIAT";break;
+case "78": $fabricante="JEEP";break;
+case "79": $fabricante="LEXUS";break;
+case "80": $fabricante="MERCURY";break;
+case "81": $fabricante="MIURA";break;
+case "82": $fabricante="PLYMOUTH";break;
+case "83": $fabricante="PONTIAC";break;
+case "84": $fabricante="SATURN";break;
+case "85": $fabricante="SAAB-SCANI";break;
+case "86": $fabricante="SCANIA-VAB";break;
+case "87": $fabricante="BRM";break;
+case "88": $fabricante="TROLLER";break;
+case "89": $fabricante="ORCA";break;
+case "90": $fabricante="MARCOPOLO";break;
+case "91": $fabricante="AM GENERAL";break;
+case "92": $fabricante="NAVISTAR";break;
+case "93": $fabricante="APRILIA";break;
+case "94": $fabricante="L´AQUILA";break;
+case "95": $fabricante="KASINSKI";break;
+case "96": $fabricante="INTERNATIO";break;
+case "98": $fabricante="ATALA";break;
+case "99": $fabricante="MOTO GUZZI";break;
+case "101": $fabricante="SMART";break;
+case "104": $fabricante="MV AGUSTA";break;
+case "106": $fabricante="MATRA";break;
+case "117": $fabricante="CROSS LANDER";break;
+case "123": $fabricante="MINI";break;
+case "124": $fabricante="MVK";break;
+case "125": $fabricante="TRAXX";break;
+case "126": $fabricante="NEOBUS";break;
+case "128": $fabricante="BY CRISTO";break;
+case "130": $fabricante="BUELL";break;
+case "131": $fabricante="GARINI";break;
+case "132": $fabricante="VENTO";break;
+case "133": $fabricante="HUSABERG";break;
+case "134": $fabricante="MIZA";break;
+case "135": $fabricante="SHINERAY";break;
+case "136": $fabricante="WUYANG";break;
+case "137": $fabricante="FYM";break;
+case "138": $fabricante="CHANA";break;
+case "139": $fabricante="LOBINI";break;
+case "141": $fabricante="JONNY";break;
+case "143": $fabricante="LIFAN";break;
+case "144": $fabricante="GAS GAS";break;
+case "145": $fabricante="HAOBAO";break;
+case "146": $fabricante="AMAZONAS";break;
+case "147": $fabricante="DAYANG";break;
+case "149": $fabricante="WALK";break;
+case "150": $fabricante="BABYBUGGY";break;
+case "151": $fabricante="BRAVA";break;
+case "155": $fabricante="ASTON MARTIN";break;
+case "157": $fabricante="DERBI";break;
+case "158": $fabricante="FOX";break;
+case "160": $fabricante="BUGRE";break;
+case "161": $fabricante="CICCOBUS";break;
+case "166": $fabricante="BIMOTA";break;
+case "167": $fabricante="GREEN MOTOS";break;
+case "168": $fabricante="MAHINDRA-B";break;
+case "170": $fabricante="VOLCANO";break;
+case "171": $fabricante="GARINNI";break;
+case "174": $fabricante="LON-V";break;
+case "176": $fabricante="DAFRA";break;
+case "177": $fabricante="DAYUN";break;
+case "178": $fabricante="WALKBUS";break;
+case "180": $fabricante="EFFA";break;
+case "183": $fabricante="MALAGUTI";break;
+case "185": $fabricante="FIBRAVAN";break;
+case "190": $fabricante="BRP";break;
+case "196": $fabricante="HAFEI";break;
+case "197": $fabricante="GREAT WALL";break;
+case "198": $fabricante="SHANDONG LANDUN";break;
+case "199": $fabricante="JINBEI";break;
+case "203": $fabricante="IROS";break;
+case "205": $fabricante="BUENO";break;
+case "206": $fabricante="BENELLI";break;
+case "208": $fabricante="MRX";break;
+case "209": $fabricante="TAC";break;
+case "211": $fabricante="CHERY";break;
+case "212": $fabricante="WAKE";break;
+case "213": $fabricante="PEGASSI";break;
+case "216": $fabricante="SINOTRUK";break;
+case "219": $fabricante="MORRIS GARAGE";break;
+case "220": $fabricante="TECMOTO";break;
+case "225": $fabricante="JOHNNYPAG";break;
+case "226": $fabricante="FYBER";break;
+case "229": $fabricante="MAGRAO TRICICLOS";break;
+case "231": $fabricante="JAC";break;
+case "236": $fabricante="EFFA-JMC";break;
+case "237": $fabricante="MAN";break;
+case "240": $fabricante="TIGER";break;
+case "246": $fabricante="LERIVO";break;
+case "247": $fabricante="RELY";break;
+case "248": $fabricante="FOTON";break;
+case "991": $fabricante="BUGGY";break;
+case "992": $fabricante="SEMI-REBOQ";break;
+case "999": $fabricante="OUTROS";break;
+	   }
+				$sql1 = "REPLACE LOW_PRIORITY INTO veiculos_allianz  (cd_marca_veiculo,fabricante,cd_modelo_veiculo,ds_descricao,nr_ano_ini,nr_ano_fim,cd_marca_fipe,cd_modelo_fipe) 
+				VALUES (
+				'".trim($array_csv[0])."',
+				'".$fabricante."',
+				'".trim($array_csv[1])."',
+				'".trim($array_csv[2])."',
+				'".trim($array_csv[3])."',
+				'".trim($array_csv[4])."',
+				'".trim($array_csv[5])."',
+				'".trim($array_csv[6])."')";
+				$result2 = mysql_query($sql1,$db);
+				if (mysql_affected_rows()==1)
+				{
+					$cont++;
+				$mensagem="<span class='style3'>Adicionado</span>";
+				}elseif (mysql_affected_rows()==0){$mensagem="<span class='style3'>Erro</span>";}
+		//}
+
+	   }
+$contador++;
+	if(mysql_affected_rows()==1)
+	{
+	$contador1++;
+	}
+$adicionado=$contador1-1;	
+}?>
+  <tr>
+   <td height="50" colspan="4"><center><h3>Quantidade total de ve&iacute;culos &nbsp;<? echo $cont;?>&nbsp;</h3></center></td>
+  </tr>
+</table>
+<?
+
+$obs="Quantidade total de ve&iacute;culos ".$cont;
+unlink($arquivo);
+}else{
+	
+	$arquivoNovo = "atualizacoesTemp/atualizar_veiculo_allianz - ".$_SESSION['roteirizador'] . " - hora - ".date('H:i')." - " . $_FILES['Filedata']['name'];
+	move_uploaded_file($_FILES['Filedata']['tmp_name'], $arquivoNovo);
+	$ponteiroArquivo = fopen($arquivoNovo, "r");
+	
+	echo "<br /><br /><br /><center><h1>Não foi possível atualizar a tabela pois o arquivo enviado está em formato inválido.<br>Informe o administrador do sistema.<h1></center>";
+	
+	$obs="Não foi possível atualizar a tabela pois o arquivo enviado está em formato inválido.";
+	}
+
+
+##################################################### REGISTRA UPLOAD ##################################################################################
+include "../class.log.php";
+try{
+$registra = new registraLog();
+$registra->upload($_SERVER['REMOTE_ADDR'],"relatorio/","atualizar_veiculo_allianz.php",$_FILES['Filedata']["name"],$_SESSION['id'],$_SESSION['permissao'],$obs );
+}
+catch(Exception $erro)
+  {
+    echo $erro;
+  }
+#######################################################################################################################################################
+
+}
+
+
+?>
+</body>
+</html>

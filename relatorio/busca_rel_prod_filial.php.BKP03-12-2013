@@ -1,0 +1,208 @@
+<?php
+set_time_limit(false);
+session_start();
+include "../../adm/conecta.php";
+include "../verifica.php";
+include "Classes/PHPExcel.php";
+include "Classes/PHPExcel/Reader/Excel2007.php";
+include "Classes/PHPExcel/Writer/Excel2007.php";
+
+function downloadFile( $fullPath ){ 
+
+  // Must be fresh start 
+  if( headers_sent() ) 
+    die('Headers Sent'); 
+
+  // Required for some browsers 
+  if(ini_get('zlib.output_compression')) 
+    ini_set('zlib.output_compression', 'Off'); 
+
+  // File Exists? 
+  if( file_exists($fullPath) ){ 
+    
+    // Parse Info / Get Extension 
+    $fsize = filesize($fullPath); 
+    $path_parts = pathinfo($fullPath); 
+    $ext = strtolower($path_parts["extension"]); 
+    
+    // Determine Content Type 
+    switch ($ext) { 
+      case "pdf": $ctype="application/pdf"; break; 
+      case "exe": $ctype="application/octet-stream"; break; 
+      case "zip": $ctype="application/zip"; break; 
+      case "doc": $ctype="application/msword"; break; 
+      case "xls": $ctype="application/vnd.ms-excel"; break; 
+      case "ppt": $ctype="application/vnd.ms-powerpoint"; break; 
+      case "gif": $ctype="image/gif"; break; 
+      case "png": $ctype="image/png"; break; 
+      case "jpeg": 
+      case "jpg": $ctype="image/jpg"; break; 
+      default: $ctype="application/force-download"; 
+    } 
+
+    header("Pragma: public"); // required 
+    header("Expires: 0"); 
+    header("Cache-Control: must-revalidate, post-check=0, pre-check=0"); 
+    header("Cache-Control: private",false); // required for certain browsers 
+    header("Content-Type: $ctype"); 
+    header("Content-Disposition: attachment; filename=\"".basename($fullPath)."\";" ); 
+    header("Content-Transfer-Encoding: binary"); 
+    header("Content-Length: ".$fsize); 
+    ob_clean(); 
+    flush(); 
+    readfile( $fullPath ); 
+
+  } else 
+    die('File Not Found'); 
+
+} 
+
+$objReader = PHPExcel_IOFactory::createReader('Excel2007');
+$objPHPExcel = $objReader->load("template/rel_prod_filial.xlsx");
+
+
+$objPHPExcel->getProperties()->setCreator("Robson Souza Cassiano")
+    						 ->setLastModifiedBy("Robson Souza Cassiano")
+							 ->setTitle("Relatorio")
+							 ->setSubject("Relatorio de producao por Filial")
+							 ->setDescription("Documento gerado pelo sistema VistOn-Line")
+							 ->setKeywords("office 2007 openxml php")
+							 ->setCategory("relatorios VistOn-Line");
+
+
+$objDrawing = new PHPExcel_Worksheet_Drawing();
+$objDrawing->setName('Logo');
+$objDrawing->setDescription('Logo');
+$objDrawing->setPath('images/'.$_SESSION[roteirizador].'.png');
+$objDrawing->setCoordinates('L3');
+$objDrawing->setHeight(86);
+
+//Recebendo valores
+$data_inicio = $_POST['data1']{6}.$_POST['data1']{7}.$_POST['data1']{8}.$_POST['data1']{9}.$_POST['data1']{3}.$_POST['data1']{4}.$_POST['data1']{0}.$_POST['data1']{1};
+$data_fim = $_POST['data2']{6}.$_POST['data2']{7}.$_POST['data2']{8}.$_POST['data2']{9}.$_POST['data2']{3}.$_POST['data2']{4}.$_POST['data2']{0}.$_POST['data2']{1};
+
+
+$data1 = $_POST['data1']{0}.$_POST['data1']{1}."-".$_POST['data1']{3}.$_POST['data1']{4}."-".$_POST['data1']{6}.$_POST['data1']{7}.$_POST['data1']{8}.$_POST['data1']{9};
+$data2 = $_POST['data2']{0}.$_POST['data2']{1}."-".$_POST['data2']{3}.$_POST['data2']{4}."-".$_POST['data2']{6}.$_POST['data2']{7}.$_POST['data2']{8}.$_POST['data2']{9};
+
+$periodo = $_POST['data1'] . ' - ' . $_POST['data2'];
+
+$sql3 = "SELECT nome_filial FROM ".$bancoDados.".controle_vp_filial WHERE roteirizador=".$_SESSION[roteirizador]." AND codigo_filial='".$_POST[filial]."'";
+$result_sql3 = mysql_query($sql3,$db);
+$resultado3 = mysql_fetch_assoc($result_sql3);
+
+
+$sql2 = "SELECT COUNT(*) as total FROM ".$bancoDados.".vistoria_previa1 WHERE roteirizador=".$_SESSION[roteirizador]." AND DTVISTORIA>=".$data_inicio." AND DTVISTORIA <=".$data_fim." AND CDFILIAL='".$_POST[filial]."'";
+$result_sql2 = mysql_query($sql2,$db);
+$resultado2 = mysql_fetch_assoc($result_sql2);
+
+
+$base = 14;
+$cont = 0;
+
+########################################### CABEÇALHO ############################################
+		$objPHPExcel->setActiveSheetIndex(0); 
+		$objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
+		$objPHPExcel->setActiveSheetIndex(0)->setCellValue('N10', $resultado2['total']);
+		$objPHPExcel->setActiveSheetIndex(0)->setCellValue('J10', $data1."  a  ".$data2);
+		$objPHPExcel->setActiveSheetIndex(0)->setCellValue('E10', strtoupper(utf8_encode($resultado3[nome_filial])));
+##################################################################################################
+
+$sql1 = "SELECT SEGURADORA, COUNT(SEGURADORA) as quantidade FROM ".$bancoDados.".vistoria_previa1 WHERE roteirizador=".$_SESSION[roteirizador]." AND DTVISTORIA>=".$data_inicio." AND DTVISTORIA <=".$data_fim." AND CDFILIAL='".$_POST[filial]."' group by SEGURADORA order by quantidade desc";
+$result_sql1 = mysql_query($sql1,$db);
+
+while ($resultado = mysql_fetch_assoc($result_sql1))
+  {
+	
+	switch($resultado["SEGURADORA"])
+{
+case "0":  $cliente_seguradora = "Bradesco Seguros"; break;
+case "30": $cliente_seguradora = "ASSETRAC"; break;
+case "31": $cliente_seguradora = "BUREAU DE BENEFICIOS"; break;
+case "32": $cliente_seguradora = "ASSUTRAN"; break;
+case "33": $cliente_seguradora = "AVANT"; break;
+case "34": $cliente_seguradora = "ACAN"; break;
+case "35": $cliente_seguradora = "ASSIST"; break;
+case "36": $cliente_seguradora = "APROCAM BRASIL"; break;
+case "37": $cliente_seguradora = "MAPFRE WARRANTY"; break;
+case "38": $cliente_seguradora = "BB SEGUROS"; break;
+case "39": $cliente_seguradora = "ZURICH SEGUROS"; break;
+case "40": $cliente_seguradora = "ALFA SEGUROS"; break;
+case "41": $cliente_seguradora = "AXA SEGUROS"; break;
+case "42": $cliente_seguradora = "BANETES SEGUROS"; break;
+case "43": $cliente_seguradora = "BRASIL VEIC.CIA SEG."; break;
+case "44": $cliente_seguradora = "CAIXA SEGURADORA"; break;
+case "45": $cliente_seguradora = "CARDIF DO BRASIL SEG."; break;
+case "46": $cliente_seguradora = "CHUBB SEGURADORA"; break;
+case "47": $cliente_seguradora = "MINAS BRASIL"; break;
+case "48": $cliente_seguradora = "CIA DE SEG. A BAHIA"; break;
+case "49": $cliente_seguradora = "CIA MUTUAL DE SEGUROS"; break;
+case "50": $cliente_seguradora = "CONAPP"; break;
+case "51": $cliente_seguradora = "CONFIANCA"; break;
+case "53": $cliente_seguradora = "GENERALI SEGUROS"; break;
+case "54": $cliente_seguradora = "GENTE SEGURADORA"; break;
+case "55": $cliente_seguradora = "HDI SEGUROS"; break; 
+case "56": $cliente_seguradora = "HSBC SEGUROS"; break;
+case "57": $cliente_seguradora = "INDIANA SEGUROS"; break;
+case "59": $cliente_seguradora = "LIBERTY SEGUROS"; break;
+case "60": $cliente_seguradora = "MAPFRE SEGUROS"; break; 
+case "61": $cliente_seguradora = "MARITIMA SEGUROS"; break;
+case "62": $cliente_seguradora = "PORTO SEGURO"; break;
+case "63": $cliente_seguradora = "REAL SEGUROS"; break;
+case "64": $cliente_seguradora = "ROYAL & SUNALLIANCE"; break;
+case "65": $cliente_seguradora = "SAFRA VIDA E PREV."; break;
+case "67": $cliente_seguradora = "SUL AMERICA SEGUROS"; break;
+case "69": $cliente_seguradora = "TOKIO MARINE"; break;
+case "70": $cliente_seguradora = "UNIBANCO AIG SEG."; break;
+case "71": $cliente_seguradora = "VERA CRUZ SEGUROS"; break;
+case "72": $cliente_seguradora = "YASUDA SEGUROS"; break;
+case "73": $cliente_seguradora = "ALLIANZ SEGUROS"; break;
+case "74": $cliente_seguradora = "APROVSUL"; break;
+case "75": $cliente_seguradora = "APTRANS"; break;
+case "76": $cliente_seguradora = "CREDIPE"; break;
+case "77": $cliente_seguradora = "APROVSUL VEICULOS"; break;
+case "78": $cliente_seguradora = "APROVSUL CARGA"; break;
+case "83": $cliente_seguradora = "MITSUI SEGUROS"; break;
+case "85": $cliente_seguradora = "ITAU SEGUROS"; break;
+case "86": $cliente_seguradora = "ASCARPE"; break;
+case "87": $cliente_seguradora = "NOBRE SEGURADORA"; break;
+case "88": $cliente_seguradora = "COMCARGA"; break;
+case "89": $cliente_seguradora = "APROCAM"; break; 
+case "95": $cliente_seguradora = "ASSOFINSP"; break;  
+case "96": $cliente_seguradora = "APPA"; break;  
+case "97": $cliente_seguradora = "HDI Audatex"; break;
+case "99": $cliente_seguradora = "Bradesco Audatex"; break;
+default: $cliente_seguradora = $resultado["SEGURADORA"]; break;
+}
+	
+		$objPHPExcel->setActiveSheetIndex(0)->insertNewRowBefore($base + $cont, 1);
+		$objPHPExcel->getActiveSheet(0)->mergeCells('B'. ($base + $cont).':'.'I'. ($base + $cont));
+		$objPHPExcel->setActiveSheetIndex(0)->setCellValue('B'. ($base + $cont), strtoupper(utf8_encode($cliente_seguradora)));
+        $objPHPExcel->setActiveSheetIndex(0)->setCellValue('K'. ($base + $cont), $resultado['quantidade']);
+        $objPHPExcel->setActiveSheetIndex(0)->setCellValue('N'. ($base + $cont), ($resultado['quantidade']/$resultado2['total']));
+  
+  $cont++;
+	  
+	  }
+
+$objPHPExcel->setActiveSheetIndex(0)->removeRow($base - 1,1);
+$objPHPExcel->setActiveSheetIndex(0)->removeRow($base + ($cont-1),1);
+
+
+$nome=strtr($resultado3[nome_filial], array(" " => "-"));
+// SAÍDA PARA ARQUIVO EXCEL
+if(!isset($_GET['disabled']))
+  {
+	  
+$periodo1 = strtr($periodo, array("/"=>"-"));
+$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+#$objWriter->save('php://output');
+$objWriter->save("relatoriosTemporarios/RELATORIO_PROD_FILIAL_".strtoupper($nome)."_".$periodo1.".xlsx");
+
+downloadFile( "relatoriosTemporarios/RELATORIO_PROD_FILIAL_".strtoupper($nome)."_".$periodo1.".xlsx" );
+
+unlink("relatoriosTemporarios/RELATORIO_PROD_FILIAL_".strtoupper($nome)."_".$periodo1.".xlsx");
+  }
+exit(0);
+// FIM -----> SAÍDA PARA ARQUIVO EXCEL
+?>

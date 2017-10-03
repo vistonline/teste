@@ -1,0 +1,153 @@
+<?php
+	session_start();
+    include "../../../adm/conecta.php";
+	$_SESSION["file_info"] = array();
+    $sql = "SELECT cliente, roteirizador FROM ".$bancoDados.".solicitacao WHERE id = '" . $_GET["id"] . $_GET["solicitacao"] . "'";
+    $resultado = mysql_query($sql, $db);
+    $vetorResultado = mysql_fetch_assoc($resultado);
+
+$solicitacao["cliente"]=$vetorResultado['cliente'];
+
+include "../../seguradora_nome.php";
+
+$seguradoraNome = $codCliente;
+
+
+?>
+<!DOCTYPE html>
+<html>
+<head>
+<title>Upload de Fotos</title>
+<link href="css/default.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="swfupload/swfupload.js"></script>
+<script type="text/javascript" src="js/handlers.js"></script>
+<script type="text/javascript">
+		var swfu;
+		window.onload = function () {
+			swfu = new SWFUpload({
+				// Backend Settings
+				upload_url: "upload.php",
+				post_params: {
+                               "PHPSESSID": "<?php echo session_id(); ?>",
+                               "seguradora": <?php echo $seguradoraNome; ?>
+                             },
+
+				// File Upload Settings
+				file_size_limit : "2 MB",	// 2MB
+				file_types : "*.jpg",
+				file_types_description : "JPG Images",
+				file_upload_limit : 0,
+
+				// Event Handler Settings - these functions as defined in Handlers.js
+				//  The handlers are not part of SWFUpload but are part of my website and control how
+				//  my website reacts to the SWFUpload events.
+				swfupload_preload_handler : preLoad,
+				swfupload_load_failed_handler : loadFailed,
+				file_queue_error_handler : fileQueueError,
+				file_dialog_complete_handler : fileDialogComplete,
+				upload_progress_handler : uploadProgress,
+				upload_error_handler : uploadError,
+				upload_success_handler : uploadSuccess,
+				upload_complete_handler : uploadComplete,
+
+				// Button Settings
+				button_image_url : "images/SmallSpyGlassWithTransperancy_17x18.png",
+				button_placeholder_id : "spanButtonPlaceholder",
+				button_width: 180,
+				button_height: 38,
+				//button_text : '<span class="button">Selecione as imagem</span>',
+				button_text_style : '.button { font-family: Helvetica, Arial, sans-serif; font-size: 12pt; } .buttonSmall { font-size: 10pt; }',
+				button_text_top_padding: 4,
+				button_text_left_padding: 30,
+				button_window_mode: SWFUpload.WINDOW_MODE.TRANSPARENT,
+				button_cursor: SWFUpload.CURSOR.HAND,
+				
+				// Flash Settings
+				flash_url : "swfupload/swfupload.swf",
+				flash9_url : "swfupload/swfupload_FP9.swf",
+
+				custom_settings : {
+					upload_target : "divFileProgressContainer",
+					imageHeight: 479,
+					imageWidth: 638,
+					imageQuality: 70,
+                    seguradora: <?php echo $seguradoraNome; ?>
+				},
+				
+				// Debug Settings
+				debug: false
+			});
+		};
+
+    //function enviar(){document.forms['myform'].submit();}
+    //window.onunload = enviar;
+	</script>
+</head>
+<body>
+<div id="header">
+<? 
+
+$foto=$vetorResultado['roteirizador'].".png";
+/*switch ($vetorResultado['roteirizador']){
+	case '0': $foto="0.png"; break;
+	case '20': $foto="20.png"; break;
+	case '60': $foto="60.png"; break;
+	case '70': $foto="70.png"; break;
+	case '75': $foto="75.png"; break;
+	case '80': $foto="80.png"; break;
+	case '90': $foto="90.png"; break;
+	case '123': $foto="123.png"; break;
+	case '627': $foto="627.png"; break;
+	case '1786': $foto="1786.png"; break;
+	//case '2630': $foto="2630.png"; break;
+	//case '123': $foto="2630.png"; break;
+	default:break;
+	}*/
+?>
+<div align="left" style="padding-top:15px"><input align="left" name="logo" type="image" src="../../usuario/fotos_empresas/logoVistOnLineFoto.png"></div>
+<div align="right" style="padding-top:20px"><input align="right" name="logo2" type="image" src="../../usuario/fotos_empresas/<? echo $foto;?>"></div>
+<center><h2 style="color:#FFF;">Sistema de Upload de Fotos</h2></center>
+
+</div>
+
+	<?php
+	if( !function_exists("imagecopyresampled") ){
+		?>
+	<div class="message">
+		<h4><strong>Error:</strong> </h4>
+		<p>Application Demo requires GD Library to be installed on your system.</p>
+		<p>Usually you only have to uncomment <code>;extension=php_gd2.dll</code> by removing the semicolon <code>extension=php_gd2.dll</code> and making sure your extension_dir is pointing in the right place. <code>extension_dir = "c:\php\extensions"</code> in your php.ini file. For further reading please consult the <a href="http://ca3.php.net/manual/en/image.setup.php">PHP manual</a></p>
+	</div>
+	<?php
+	} else {
+	?>
+	
+	<?php
+	}
+	?>
+
+
+<form name="myform" id="myform" method="post" action="processo_foto_2.php?id=<?php echo $_GET["id"]. $_GET["solicitacao"] ; ?>&seguradora=<?php echo $seguradoraNome; ?>&rot=<?php echo $vetorResultado['roteirizador']; ?>">
+	<div id="thumbnails">
+    	<h2>Escolher fotos</h2>
+		<p>Clique na lupa, ao abrir a janela selecione todas as fotos de uma vez . Você pode segurar a tecla CONTROL e selecionar com o mouse as fotos desejadas. Caso deseje enviar todas as fotos da pasta então aperte CONTROL + A.</p>
+        <p><strong>Adicionar apenas imagens em formato JPG.</strong></p>
+		<div id="select_image" style=" width:30px; height: 25px; padding-top:10px">
+			<span id="spanButtonPlaceholder"></span>
+		</div>
+    	<div id="divFileProgressContainer" style="height: 75px;"></div>
+    </div>
+    <br clear="all">
+
+	<div id="btn_foto" align="center" ><br/>
+		<?php
+          if($seguradoraNome == "20")
+            {
+			  	echo '<input type="submit" value="enviar" onclick="if(!valida()){ alert(\'Escolha o tipo de todas as fotos antes de enviar\'); return false;}" id="input_enviar"/>';
+            }?>	
+	</div>
+</form>
+    
+
+</body>
+</html>

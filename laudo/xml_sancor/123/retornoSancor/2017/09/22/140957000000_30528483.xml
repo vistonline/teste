@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NS1:Envelope xmlns:NS1="http://schemas.xmlsoap.org/soap/envelope/"><NS1:Header><NS2:ResponseHeader xmlns:NS2="http://gruposancorseguros.com/Ssb/Auto/CommonSchemas/Headers/v1.0"><responseStatus><statusCode>SystemException</statusCode></responseStatus></NS2:ResponseHeader></NS1:Header><NS1:Body><NS1:Fault><faultcode>IES-1002</faultcode><faultstring>Servi&#231;o indispon&#237;vel</faultstring></NS1:Fault></NS1:Body></NS1:Envelope>

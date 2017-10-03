@@ -1,0 +1,114 @@
+<?php
+session_start();
+ignore_user_abort();
+
+include "../../../adm/conecta.php";
+
+// PEGA DIRETORIO TEMPORÁRIO
+$diretorio=session_id()."/";
+
+$rotB64=$_GET['rot'];
+$bancoDados="webvist_".base64_decode($_GET['rot']);
+
+// PEGA O ROTEIRIZADOR DA SOLICITAÇÃO POIS PODE SER UMA VISTORIA DE INTEGRAÇÃO
+$sql_rot = "SELECT roteirizador, SEGURADORA FROM ".$bancoDados.".vistoria_previa1 WHERE NUMEROSOLICITACAO= ".$_GET["id"] . $_GET["solicitacao"] . "";
+//echo $sql_rot;
+$result_rot = mysql_query($sql_rot,$db);
+$rot=mysql_fetch_assoc($result_rot);
+
+$_SESSION["nome_seguradora"]=$rot['SEGURADORA'];
+
+include "../../seguradora_nome.php";
+$nome_seg=strtr($cliente_seguradora, array(" "=>"_", " & "=>"_", "."=>"", ));
+
+// NOVO DIRETORIO ONDE SERÃO SALVO AS FOTOS
+//$novo_diretorio='../../fotos/'.date('Y').'/'.date('m').'/'.date('d').'/'.'rot_'.$rot[roteirizador].'/'.$nome_seg.'/'.$_GET[id].'/';
+$novo_diretorio='../../PHOTOS/rot_'.$rot[roteirizador].'/'.$nome_seg.'/'.date('Y').'/'.date('m').'/'.date('d').'/'.$_GET[id].'/';
+$diretorio_trust='../../../fotos_trust/';
+// CRIANDO ARVORE DE PASTAS
+@mkdir('../../PHOTOS/', 0777);
+@chmod('../../PHOTOS/', 0777);
+@mkdir('../../PHOTOS/rot_'.$rot[roteirizador], 0777);
+@chmod('../../PHOTOS/rot_'.$rot[roteirizador], 0777);
+@mkdir('../../PHOTOS/rot_'.$rot[roteirizador].'/'.$nome_seg, 0777);
+@chmod('../../PHOTOS/rot_'.$rot[roteirizador].'/'.$nome_seg, 0777);
+@mkdir('../../PHOTOS/rot_'.$rot[roteirizador].'/'.$nome_seg.'/'.date('Y'), 0777);
+@chmod('../../PHOTOS/rot_'.$rot[roteirizador].'/'.$nome_seg.'/'.date('Y'), 0777);
+@mkdir('../../PHOTOS/rot_'.$rot[roteirizador].'/'.$nome_seg.'/'.date('Y').'/'.date('m'), 0777);
+@chmod('../../PHOTOS/rot_'.$rot[roteirizador].'/'.$nome_seg.'/'.date('Y').'/'.date('m'), 0777);
+@mkdir('../../PHOTOS/rot_'.$rot[roteirizador].'/'.$nome_seg.'/'.date('Y').'/'.date('m').'/'.date('d'), 0777);
+@chmod('../../PHOTOS/rot_'.$rot[roteirizador].'/'.$nome_seg.'/'.date('Y').'/'.date('m').'/'.date('d'), 0777);
+@mkdir('../../PHOTOS/rot_'.$rot[roteirizador].'/'.$nome_seg.'/'.date('Y').'/'.date('m').'/'.date('d').'/'.$_GET[id], 0777);
+@chmod('../../PHOTOS/rot_'.$rot[roteirizador].'/'.$nome_seg.'/'.date('Y').'/'.date('m').'/'.date('d').'/'.$_GET[id], 0777);
+//MOVENDO FOTOS PARA AS PASTAS CERTAS
+if($_GET["seguradora"] == 20)
+  { //Nomeia fotos no padrão Boné
+    foreach ( $_POST as $key => $value)
+      {
+	    if($value != "excluir")
+		  {
+            copy($diretorio.$key.'.jpg', $novo_diretorio.$_GET["id"].'_'.$value.'.jpg');
+            $sql_fotos = "INSERT INTO ".$bancoDados.".fotos (fotos,id,data,hora) VALUES ('".$_GET["id"]."_".$value.".jpg','".$_GET["id"]."','".date('Ymd')."','".date('Hi')."')";
+            $result_fotos = mysql_query($sql_fotos,$db);
+		  }
+        unlink($diretorio.$key.'.jpg');
+      }
+  }
+else
+  {
+    $vetorDiretorio = scandir($diretorio, 1);
+    array_pop($vetorDiretorio);
+    array_pop($vetorDiretorio);
+    
+    //print_r($chaves);
+	
+	if($_GET['qf']!=''){
+		$quant=(int)$_GET['qf']+1;
+		}else{
+			$quantidade = scandir($novo_diretorio);
+			$quant=count($quantidade);
+			array_pop($quantidade);
+			array_pop($quantidade);
+			}
+    
+    for( $i = $quant, $chaves = array_keys($vetorDiretorio); false !== current($chaves); next($chaves), $i++)
+      { //print_r($chaves);
+        //var_dump($i);
+        $arquivo = $vetorDiretorio[ current($chaves) ];
+
+        if(trim($nome_seg == 'HDI')) $nomeFoto = str_pad($_GET["id"].'_'.$i.'.jpg', 20, "0", STR_PAD_LEFT);
+        else $nomeFoto = $_GET["id"].'_'.$i.'.jpg';
+        copy($diretorio.$arquivo, $novo_diretorio.$nomeFoto);
+		if(trim($nome_seg == 'TRUST')){
+			copy($diretorio.$arquivo, $diretorio_trust.$nomeFoto);
+			}
+        //echo $novo_diretorio.$nomeFoto . "\n<br>";
+
+        $sql_fotos = "INSERT INTO ".$bancoDados.".fotos (fotos,id,data,hora) VALUES ('" . $nomeFoto . "', '" . $_GET["id"] . "','" . date('Ymd') . "','" . date('Hi') . "')";
+        //echo $sql_fotos."<br>";
+        $result_fotos = mysql_query($sql_fotos,$db);
+        unlink($diretorio.$arquivo);
+        rmdir($diretorio);
+      }
+  }
+//O diretório precisa estar vazio.
+$sql_atualiza_fotos = "UPDATE ".$bancoDados.".vistoria_previa1 SET	INFOTOS = '1' WHERE NUMEROSOLICITACAO = '" . $_GET["id"] . "'"; 
+$result_atualiza_fotos = mysql_query($sql_atualiza_fotos,$db);
+rmdir($diretorio);
+
+?>
+
+    <script language=javascript>
+
+function fechar(){
+try{
+if(document.all){
+window.opener = window
+window.close("#")
+}else{
+self.close();
+}
+}catch(error){}
+}
+	  window.location='../../fotos/index.php?id=<? echo $_GET[id] . $_GET["solicitacao"];?>';
+</script> 

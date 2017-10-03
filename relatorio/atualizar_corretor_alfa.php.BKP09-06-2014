@@ -1,0 +1,175 @@
+<?
+include "../../adm/conecta.php";
+include "../verifica.php";
+ini_set("memory_limit","90M");
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<script language="JavaScript" type="text/javascript" src="richtext.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Atualizar Corretor Alfa</title>
+<style type="text/css">
+<!--
+.style1 {color: #FFFFFF}
+.style12 {	color: #333333;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+}
+.style13 {
+	font-size: 9px
+}
+.style14 {color: #333333; font-family: Arial, Helvetica, sans-serif; font-size: 9px; font-weight: bold; }
+-->
+.style12 {	color: #333333;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+}
+.style15 {color: #000066}
+</style>
+<!-- Copyright 2000, 2001, 2002, 2003, 2004, 2005 Macromedia, Inc. All rights reserved. -->
+</head>
+
+<body>
+
+<form action="atualizar_corretor_alfa.php" method="post" enctype="multipart/form-data" name="RTEDemo">
+<table width="100%" border="00" cellpadding="0" cellspacing="0">
+  <tr>
+    <td height="50" colspan="2" style="color:#FFF; background:#000; text-align:center; font-weight:bold">&nbsp;&nbsp;Atualizar corretor Alfa</td>
+  </tr>
+  <tr>
+    <td height="27" colspan="2"><span class="style12">&nbsp;&nbsp;</span></td>
+  </tr>
+<TR onMouseOver="this.style.backgroundColor='#0099cc'" onMouseOut="javascript:this.style.backgroundColor=''" >
+    <td width="25%" height="30" class="style12 style15">&nbsp;&nbsp;Insira o arquivo no formato csv <br />
+&nbsp;      (separado por ponto e virgula). </td>
+    <td> <div align="left" class="style12">
+      &nbsp;
+      <input type="file" name="Filedata" id="Filedata" />
+    </div></td>
+  </tr>
+ <tr> 
+    <td height="50" colspan="2">
+      <br /><br />
+       <div style="width:50%; float:left; text-align:center">
+   	    	<img src="../imagens/voltar.png" style="cursor:pointer" title="voltar" onclick="window.top.novo('ferramentas','body','checar_body');document.getElementById('atualiza').value='';" />
+		</div>
+   <div style="width:50%; float:left; text-align:center">
+   		<input type="image" src="../imagens/atualizar.png" name="Submit" id="button" title="Atualizar" />
+	</div>
+      
+      </td>
+  </tr>
+</table>
+</form>
+<?
+
+preg_match('/(Corretores Alfa)[^|]{1,}/i', $_FILES['Filedata']["name"], $result);
+preg_match('/\.([0-9A-z]{1,})/i', $_FILES['Filedata']["name"], $result2);
+$nomeArquivo=$result[1];
+$extensao=$result2[1];
+
+if($_FILES)
+{
+@mkdir("atualizacoesTemp",0777);
+$arquivo = "atualizacoesTemp/corretor_alfa".date(Ymd)."".date('H:i').".csv";
+move_uploaded_file($_FILES['Filedata']['tmp_name'], $arquivo);
+$fp = fopen($arquivo,'r');
+
+if( ($nomeArquivo=='Corretores Alfa') && (strtoupper($extensao)=='CSV' ) )
+{
+	
+//lemos o arquivo
+$texto = fread($fp, filesize($arquivo));
+$array = split("\n",$texto);
+$contador=0;
+//print_r($array);
+
+ $cont=0;
+ $cont1=0;
+ $contador=1;
+ $contador1=1;
+   while($contador1<=1)
+   {
+   $dados = split(";",$array[$contador]);
+//select 
+/*
+registro              $dados[0];
+local                 $dados[1];
+nome                  $dados[2];
+uf			          $dados[3];
+*/	
+if(strlen(trim($dados[0]))>2)
+{
+	
+
+	
+	   $sql_fipe = "SELECT * FROM corretores_alfa WHERE registro = '".trim($dados[0])."' AND local = '".trim($dados[1])."'";
+	   $result_fipe = @mysql_query($sql_fipe,$db);
+	   if(@mysql_num_rows($result_fipe)>0)
+	   {
+	      $mensagem="<span class='style2'>Sem altera&ccedil;&atilde;o</span>";
+	   }
+	   else
+	   {    
+				$sql1 = "INSERT INTO corretores_alfa (registro,local,nome,uf) 
+				VALUES (
+				'".trim($dados[0])."',
+				'".trim($dados[1])."',
+				'".str_replace("#","",trim($dados[2]))."',
+				'".trim($dados[3])."')";
+				$result2 = mysql_query($sql1,$db);
+				if ($result2)
+				{
+				$mensagem="<span class='style3'>Adicionado</span>";
+				$cont1++;
+				}
+		}
+ ?>
+
+<? 
+}
+$contador++;
+	if($dados[0]=='')
+	{
+	$contador1++;
+	}
+}?>
+ <table>
+  <tr>
+   <td height="27" colspan="4" ><div align="right" class="style12"><b>Quantidade Corretores Alfa Adicionados &nbsp;<?php echo $cont1;?>&nbsp;</b></div></td>
+  </tr>
+ </table>
+
+<?
+$obs="Quantidade Corretores Alfa Adicionados ".$cont1;
+unlink($arquivo);
+}else{
+	
+	$arquivo = "atualizacoesTemp/atualizar_corretor_alfa - ".$_SESSION['roteirizador'] . " - hora - ".date('H:i')." - " . $_FILES['Filedata']['name'];
+	move_uploaded_file($_FILES['Filedata']['tmp_name'], $arquivo);
+	$ponteiroArquivo = fopen($arquivo, "r");
+	
+	echo "<br /><br /><br /><center><h1>Não foi possível atualizar a tabela pois o arquivo enviado está em formato inválido.<br>Informe o administrador do sistema.<h1></center>";
+	
+	$obs="Não foi possível atualizar a tabela pois o arquivo enviado está em formato inválido.";
+	}
+
+##################################################### REGISTRA UPLOAD ##################################################################################
+include "../class.log.php";
+try{
+$registra = new registraLog();
+$registra->upload($_SERVER['REMOTE_ADDR'],"relatorio/","atualizar_corretor_alfa.php",$_FILES['Filedata']["name"],$_SESSION['id'],$_SESSION['permissao'],$obs );
+}
+catch(Exception $erro)
+  {
+    echo $erro;
+  }
+#######################################################################################################################################################
+
+}
+?>
+</body>
+</html>

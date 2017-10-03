@@ -1,0 +1,587 @@
+<?
+if($_GET[div]=='checar_relatorio')
+{
+	if($_GET[dados]=='DTVISTORIA')
+	{
+	echo "&nbsp;&nbsp;Insira a Data da Vistoria";
+	}
+	if($_GET[dados]=="DTTRANS")
+	{
+	echo "&nbsp;&nbsp;Insira a Data de Transmiss&atilde;o";
+	}
+	if($_GET[dados]=="TXT_bradesco")
+	{
+	echo "&nbsp;&nbsp;Insira a Data de Transmiss&atilde;o";
+	}
+	if($_GET[dados]=="TXT_bradesco_consorcio")
+	{
+	echo "&nbsp;&nbsp;Insira a Data de Transmiss&atilde;o";
+	}
+	if($_GET[dados]=="TXT_sas")
+	{
+	echo "&nbsp;&nbsp;Insira a Data da Vistoria";
+	}
+	if($_GET[dados]=="TXT_hdi")
+	{
+	echo "&nbsp;&nbsp;Insira a Data da Vistoria";    
+	}
+	if($_GET[dados]=='')
+	{
+	echo "&nbsp;&nbsp;<span class='style19'>Escolha um tipo de relat&oacute;rio</span>";
+	}
+	if($_GET[dados]=="DTVISTORIA_mapfre")
+	{
+	echo "&nbsp;&nbsp;Insira a Data da Vistoria";    
+	}
+	if($_GET[dados]=="DTTRANS_mapfre")
+	{
+	echo "&nbsp;&nbsp;Insira a Data de Transmiss&atilde;o";    
+	}
+	if($_GET[dados]=="DTVISTORIA_caixa")
+	{
+	echo "&nbsp;&nbsp;Insira a Data da Vistoria";    
+	}
+	if($_GET[dados]=="DTTRANS_caixa")
+	{
+	echo "&nbsp;&nbsp;Insira a Data de Transmiss&atilde;o";    
+	}
+	if($_GET[dados]=="DTVISTORIA_bb")
+	{
+	echo "&nbsp;&nbsp;Insira a Data da Vistoria";    
+	}
+	if($_GET[dados]=="DTTRANS_bb")
+	{
+	echo "&nbsp;&nbsp;Insira a Data de Transmiss&atilde;o";    
+	}
+	if($_GET[dados]=="excel_alfa")
+	{
+	echo "&nbsp;&nbsp;Insira a Data da Vistoria";   
+	}
+}
+$controle=0;
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='0<>Bradesco Seguros')
+{
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="TXT_bradesco">TXT - FATCOM BRADESCO</option>
+  <option value="DTVISTORIA_SEGUROS">EXCEL BRADESCO SEGUROS - data de vistoria</option>
+  <option value="DTTRANS_SEGUROS">EXCEL BRADESCO SEGUROS - data de transmiss&atilde;o</option>
+  <option value="TXT_bradesco_consorcio">TXT - FATCOM BRADESCO CONSORCIO</option>
+  <option value="DTVISTORIA_CONSORCIOBRADESCO">EXCEL CONSORCIO - data de vistoria</option>
+  <option value="DTTRANS_CONSORCIOBRADESCO">EXCEL CONSORCIO - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+}
+?>
+<? 
+/*if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='60<>MAPFRE SEGUROS')
+{
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_mapfre">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_mapfre">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL S/Frutradas- data de vistoria</option>
+  <option value="DTTRANS">EXCEL S/Frustradas- data de transmiss&atilde;o</option>
+  <option value="DTTRANS_frustradas">EXCEL Somente Frustradas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA_frustradas">EXCEL Somente Frustradas - data de vistoria</option>
+</select>
+<? 
+$controle=1;
+}
+*/
+?>
+
+<? 
+/*if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='37<>MAPFRE WARRANTY')
+{
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_mapfre">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_mapfre">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL S/Frutradas- data de vistoria</option>
+  <option value="DTTRANS">EXCEL S/Frustradas- data de transmiss&atilde;o</option>
+  <option value="DTTRANS_frustradas">EXCEL Somente Frustradas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA_frustradas">EXCEL Somente Frustradas - data de vistoria</option>
+</select>
+<? 
+$controle=1;
+}*/
+?>
+
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='86<>ASCARPE')
+{/*
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_ascarpe">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTVISTORIA_ascarpe">EXCEL - data de vistoria</option>
+</select>
+<? 
+$controle=1;
+*/}
+?>
+
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='96<>APPA')
+{/*
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_appa">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_appa">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+*/}
+?>
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='33<>AVANT')
+{/*
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_avant">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_avant">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+*/}
+?>
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='61<>MARITIMA')
+{
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_maritima">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_maritima">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+}
+?>
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='25<>TRUST')
+{/*
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_trust">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_trust">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+*/}
+?>
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='314<>UNIPROPAS')
+{/*
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_unipropas">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_unipropas">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+*/}
+?>
+
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='320<>ASPEM')
+{/*
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_aspem">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_aspem">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+*/}
+?>
+
+
+
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='26<>ZURICH GARANTIA')
+{/*
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_zurich_garantia">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_zurich_garantia">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+*/}
+?>
+
+<? 
+$controle=0;
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='67<>SUL AMERICA')
+{
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="TXT_sas">TXT - FATCOM SAS</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+}
+?>
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='34<>ACAN')
+{/*
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_acan">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_acan">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+*/}
+?>
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='35<>ASSIST')
+{/*
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_assist">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_assist">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+*/}
+?>
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='36<>APROCAM BRASIL')
+{/*
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_aprocam_brasil">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_aprocam_brasil">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+*/}
+?>
+
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='30<>ASSETRAC')
+{/*
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_assetrac">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_assetrac">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+*/}
+?>
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='20<>BONE')
+{/*
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_bone">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_bone">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+*/}
+?>
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='21<>MULTCAR')
+{/*
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_multcar">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_multcar">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+*/}
+?>
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='22<>RODOTRUCK')
+{/*
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_rodotruck">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_rodotruck">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+*/}
+?>
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='24<>VERTICE')
+{/*
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_vertice">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_vertice">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+*/}
+?>
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='23<>ACE')
+{
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_ace">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_ace">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+}
+?>
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='31<>BUREAU DE BENEFICIOS')
+{/*
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_assetrac">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_assetrac">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+*/}
+?>
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='32<>ASSUTRAN')
+{/*
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_assutran">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_assutran">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+*/}
+?>
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='87<>NOBRE')
+{/*
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_nobre">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_nobre">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+*/}
+?>
+
+
+
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='88<>COMCARGA')
+{/*
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_comcarga">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_comcarga">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+*/}
+?>
+
+
+
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='89<>APROCAM')
+{/*
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_aprocam">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_aprocam">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+*/}
+?>
+
+
+
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='95<>ASSOFINSP')
+{/*
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_assofinsp">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_assofinsp">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+*/}
+?>
+
+
+
+
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='44<>CAIXA SEGURADORA')
+{
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_caixa">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_caixa">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+}
+?>
+
+<? 
+/*if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='38<>BB SEGUROS')
+{
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA_bb">EXCEL - KM rodado + vistorias realizadas - data de vistoria</option>
+  <option value="DTTRANS_bb">EXCEL - KM rodado + vistorias realizadas - data de transmiss&atilde;o</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+}*/
+?>
+
+
+<? 
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='55<>HDI')
+{
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="TXT_hdi">TXT - FATCOM HDI</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<? 
+$controle=1;
+}
+if($_GET[div]=='modifica_relatorio'&&$_GET[dados]=='40<>ALFA SEGUROS')
+{
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="excel_alfa">EXCEL - ALFA</option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>  
+</select>
+<? 
+$controle=1;
+}
+
+// EXCETO BRADESCO E MARITIMA E TRUST
+if($controle==0&&$_GET[div]=='modifica_relatorio'&&$_GET[dados]!='0<>Bradesco Seguros'&&$_GET[dados]!='61<>MARITIMA'&&$_GET[dados]!='25<>TRUST')
+{
+?>
+<select name="tipo_relatorio" class="style18" id="tipo_relatorio" onChange="x(this.value,'dados_relatorio','checar_relatorio');">
+  <option value=""></option>
+  <option value="DTVISTORIA">EXCEL - data de vistoria</option>
+  <option value="DTTRANS">EXCEL - data de transmiss&atilde;o</option>
+</select>
+<?
+}
+?>
